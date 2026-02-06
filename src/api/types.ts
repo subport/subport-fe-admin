@@ -12,6 +12,13 @@ export interface Subscription {
   lastModifiedAt: string;
 }
 
+export interface UpdateSubscriptionRequest {
+  name: string;
+  type: string;
+  planUrl?: string;
+  logoImage?: File;
+}
+
 export interface PlansResponse {
   plans: Plan[];
 }
