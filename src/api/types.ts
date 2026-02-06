@@ -25,3 +25,10 @@ export interface Plan {
   createdAt: string;
   lastModifiedAt: string;
 }
+
+export interface CreatePlanRequest {
+  name: string;
+  amount: string;
+  amountUnit: string;
+  durationMonths: number;
+}
