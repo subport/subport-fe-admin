@@ -14,3 +14,7 @@ export function registerPlan(subscriptionId: number, data: CreatePlanRequest) {
 export function updatePlan(planId : number, data: UpdatePlanRequest) {
   return api.put(`${BASE}/${planId}`, data)
 }
+
+export function deletePlan(planId : number) {
+  return api.delete(`${BASE}/${planId}`)
+}
