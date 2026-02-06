@@ -33,7 +33,7 @@ export interface Plan {
   lastModifiedAt: string;
 }
 
-export interface CreatePlanRequest {
+export interface RegisterPlanRequest {
   name: string;
   amount: string;
   amountUnit: string;
