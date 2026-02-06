@@ -32,3 +32,10 @@ export interface CreatePlanRequest {
   amountUnit: string;
   durationMonths: number;
 }
+
+export interface UpdatePlanRequest {
+  name: string;
+  amount: string;
+  amountUnit: string;
+  durationMonths: number;
+}
