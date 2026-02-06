@@ -1,10 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import SubscriptionsView from '@/views/subscription/SubscriptionsView.vue';
+import SubscriptionListView from '@/views/subscription/SubscriptionListView.vue';
+import SubscriptionDetailView from '@/views/subscription/SubscriptionDetailView.vue';
 
 const routes = [
   {
     path: '/subscriptions',
-    component: SubscriptionsView,
+    component: SubscriptionListView,
+  },
+  {
+    path: '/subscriptions/:id',
+    component: SubscriptionDetailView,
   },
 ];
 
