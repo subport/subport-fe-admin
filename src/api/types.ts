@@ -11,3 +11,17 @@ export interface Subscription {
   createdAt: string;
   lastModifiedAt: string;
 }
+
+export interface PlansResponse {
+  plans: Plan[];
+}
+
+export interface Plan {
+  id: number;
+  name: string;
+  amount: string;
+  amountUnit: string;
+  durationMonths: number;
+  createdAt: string;
+  lastModifiedAt: string;
+}
