@@ -1,4 +1,4 @@
-export interface SubscriptionResponse {
+export interface SubscriptionsResponse {
   subscriptions: Subscription[];
 }
 

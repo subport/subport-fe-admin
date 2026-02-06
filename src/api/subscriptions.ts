@@ -1,8 +1,8 @@
 import api from '.';
-import type { SubscriptionResponse } from './types';
+import type { SubscriptionsResponse } from './types';
 
 const BASE = '/subscriptions';
 
 export function getSubscriptions() {
-  return api.get<SubscriptionResponse>(BASE);
+  return api.get<SubscriptionsResponse>(BASE);
 }
