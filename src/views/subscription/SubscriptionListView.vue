@@ -13,7 +13,7 @@
         <th class="plan-url-col" scope="col">플랜 페이지</th>
         <th class="created-at-col" scope="col">등록일</th>
         <th class="updated-at-col" scope="col">최근 수정일</th>
-        <th class="action-col" scope="col">작업</th>
+        <th class="action-col" scope="col">상세보기</th>
       </tr>
     </thead>
     <tbody>
@@ -30,7 +30,7 @@
         </td>
         <td class="name-col">{{ subscription.name }}</td>
         <td class="type-col">{{ subscription.type }}</td>
-        <td class="type-col">
+        <td class="plan-url-col">
           <a
             v-if="subscription.planUrl"
             :href="subscription.planUrl"
@@ -41,17 +41,16 @@
           </a>
           <span v-else>-</span>
         </td>
-        <td class="type-col">{{ subscription.createdAt }}</td>
-        <td class="type-col">{{ subscription.lastModifiedAt }}</td>
+        <td class="created-at-col">{{ subscription.createdAt }}</td>
+        <td class="updated-at-col">{{ subscription.lastModifiedAt }}</td>
         <td class="action-col">
           <button
             class="btn btn-sm btn-update me-2"
             type="button"
-            @click="goUpdateSubscription(subscription.id)"
+            @click="goSubscriptionDetail(subscription.id)"
           >
-            관리
+            상세보기
           </button>
-          <button class="btn btn-sm btn-delete">삭제</button>
         </td>
       </tr>
     </tbody>
@@ -67,8 +66,8 @@ import { useRouter } from 'vue-router';
 const subscriptions = ref<Subscription[]>([]);
 
 const router = useRouter();
-const goUpdateSubscription = (id: number) => {
-  router.push(`/subscriptions/${id}/update`);
+const goSubscriptionDetail = (id: number) => {
+  router.push(`/subscriptions/${id}`);
 };
 
 const fetchSubscriptions = async () => {
