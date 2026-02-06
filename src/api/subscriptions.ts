@@ -42,3 +42,7 @@ export function updateSubscription(
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 }
+
+export function deleteSubscription(subscriptionId: number) {
+  return api.delete(`${BASE}/${subscriptionId}`);
+}
