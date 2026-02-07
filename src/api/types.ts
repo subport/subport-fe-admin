@@ -60,3 +60,21 @@ export interface PlanForm {
   amountUnit: string;
   durationMonths: number;
 }
+
+// 상수
+export const SUBSCRIPTION_TYPES = [
+  'OTT',
+  '음원 스트리밍',
+  '동영상 스트리밍',
+  'AI',
+  '쇼핑',
+  '배달/음식',
+  '도서',
+  '메신저',
+  'VPN',
+  '크리에이티브 툴',
+  '클라우드',
+  '기타',
+];
+
+export const AMOUNT_UNITS = ['KRW', 'USD'];

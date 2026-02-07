@@ -442,34 +442,19 @@ import {
   updateSubscription,
 } from '@/api/subscriptions';
 import { deletePlan, getPlans, registerPlan, updatePlan } from '@/api/plans';
-import type {
-  Subscription,
-  Plan,
-  RegisterPlanRequest,
-  UpdatePlanRequest,
-  UpdateSubscriptionRequest,
-  PlanForm,
+import {
+  type Subscription,
+  type Plan,
+  type RegisterPlanRequest,
+  type UpdatePlanRequest,
+  type UpdateSubscriptionRequest,
+  type PlanForm,
+  AMOUNT_UNITS,
+  SUBSCRIPTION_TYPES,
 } from '@/api/types';
 
 const route = useRoute();
 const router = useRouter();
-
-// 상수
-const SUBSCRIPTION_TYPES = [
-  'OTT',
-  '음원 스트리밍',
-  '동영상 스트리밍',
-  'AI',
-  '쇼핑',
-  '배달/음식',
-  '도서',
-  '메신저',
-  'VPN',
-  '크리에이티브 툴',
-  '클라우드',
-  '기타',
-];
-const AMOUNT_UNITS = ['KRW', 'USD'];
 
 // Reactive 상태 (구독)
 const subscriptionId = Number(route.params.id);
