@@ -16,10 +16,7 @@ export function getSubscription(subscriptionId: number) {
   return api.get<Subscription>(`${BASE}/${subscriptionId}`);
 }
 
-export function registerSubscription(
-  subscriptionId: number,
-  data: RegisterSubscriptionRequest,
-) {
+export function registerSubscription(data: RegisterSubscriptionRequest) {
   const formData = new FormData();
 
   const jsonBlob = new Blob(
