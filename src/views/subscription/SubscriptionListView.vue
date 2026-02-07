@@ -1,15 +1,15 @@
 <template>
-  <div class="page-title">
+  <div class="page-title mb-4">
     <h3>구독 서비스 목록</h3>
-    <hr class="my-4" />
   </div>
+
   <table class="table table-dark table-hover align-middle">
     <thead>
       <tr>
         <th class="id-col" scope="col">ID</th>
+        <th class="type-col" scope="col">타입</th>
         <th class="logo-col" scope="col">로고</th>
         <th class="name-col" scope="col">이름</th>
-        <th class="type-col" scope="col">타입</th>
         <th class="plan-url-col" scope="col">플랜 페이지</th>
         <th class="created-at-col" scope="col">등록일</th>
         <th class="updated-at-col" scope="col">최근 수정일</th>
@@ -19,6 +19,9 @@
     <tbody>
       <tr v-for="subscription in subscriptions" :key="subscription.id">
         <th class="id-col" scope="row">{{ subscription.id }}</th>
+        <td class="type-col">
+          <span class="badge bg-secondary"> {{ subscription.type }}</span>
+        </td>
         <td class="logo-col">
           <img
             :src="subscription.logoImageUrl"
@@ -29,13 +32,12 @@
           />
         </td>
         <td class="name-col">{{ subscription.name }}</td>
-        <td class="type-col">{{ subscription.type }}</td>
         <td class="plan-url-col">
           <a
             v-if="subscription.planUrl"
             :href="subscription.planUrl"
             target="_blank"
-            class="link"
+            class="link link-color"
           >
             링크
           </a>
@@ -45,11 +47,11 @@
         <td class="updated-at-col">{{ subscription.lastModifiedAt }}</td>
         <td class="action-col">
           <button
-            class="btn btn-sm btn-update me-2"
+            class="btn btn-sm btn-detail me-2"
             type="button"
             @click="goSubscriptionDetail(subscription.id)"
           >
-            상세보기
+            <i class="bi bi-search"></i> 상세보기
           </button>
         </td>
       </tr>
@@ -93,7 +95,7 @@ onMounted(() => {
   --bs-table-bg: #313137;
   --bs-table-color: #ffffff;
   table-layout: fixed;
-  width: 98%;
+  width: 100%;
 }
 
 .id-col,
@@ -107,23 +109,26 @@ onMounted(() => {
   text-align: center;
 }
 
-.link {
+.link-color {
   color: #6fcfc3;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+.link-color:hover {
+  color: #5bb8ad;
   text-decoration: underline;
-  cursor: pointer;
 }
 
-.link:hover {
-  color: #57b9ad;
-}
-
-.btn-update {
+.btn-detail {
   background-color: #6fcfc3;
   border-color: #6fcfc3;
   color: #000;
 }
 
-.btn-update:hover {
+.btn-detail:hover {
   background-color: #5bb8ad;
   border-color: #5bb8ad;
 }
