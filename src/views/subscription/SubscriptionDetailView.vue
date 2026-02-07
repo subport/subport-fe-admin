@@ -355,9 +355,7 @@
 
                 <!-- 수정 모드 -->
                 <template v-else>
-                  <td class="text-center">
-                    <span class="badge bg-light text-dark">{{ plan.id }}</span>
-                  </td>
+                  <td class="text-center">{{ plan.id }}</td>
                   <td>
                     <input
                       v-model="planEditForm.name"
@@ -450,6 +448,7 @@ import type {
   RegisterPlanRequest,
   UpdatePlanRequest,
   UpdateSubscriptionRequest,
+  PlanForm,
 } from '@/api/types';
 
 const route = useRoute();
@@ -458,17 +457,17 @@ const router = useRouter();
 // 상수
 const SUBSCRIPTION_TYPES = [
   'OTT',
-  'MUSIC_STREAMING',
-  'VIDEO_STREAMING',
+  '음원 스트리밍',
+  '동영상 스트리밍',
   'AI',
-  'SHOPPING',
-  'FOOD',
-  'BOOK',
-  'MESSENGER',
+  '쇼핑',
+  '배달/음식',
+  '도서',
+  '메신저',
   'VPN',
-  'CREATIVE_TOOL',
-  'CLOUD',
-  'ETC',
+  '크리에이티브 툴',
+  '클라우드',
+  '기타',
 ];
 const AMOUNT_UNITS = ['KRW', 'USD'];
 
@@ -496,13 +495,13 @@ const logoInput = ref<HTMLInputElement | null>(null);
 
 // Reactive 상태 (플랜)
 const plans = ref<Plan[]>([]);
-const planRegisterForm = ref({
+const planRegisterForm = ref<PlanForm>({
   name: '',
   amount: 0,
   amountUnit: '',
   durationMonths: 1,
 });
-const planEditForm = ref({
+const planEditForm = ref<PlanForm>({
   name: '',
   amount: 0,
   amountUnit: '',
@@ -554,6 +553,11 @@ const changeLogo = (event: Event) => {
   }
 };
 const handleUpdateSubscription = async () => {
+  if (subscriptionEditForm.value.name.length > 10) {
+    alert('이름은 최대 10자까지 가능합니다');
+    return;
+  }
+
   try {
     const formData: UpdateSubscriptionRequest = {
       name: subscriptionEditForm.value.name,
@@ -627,12 +631,9 @@ const startSavePlan = () => {
   };
 };
 const savePlan = async () => {
-  if (
-    !planRegisterForm.value.name ||
-    !planRegisterForm.value.amount ||
-    !planRegisterForm.value.amountUnit
-  ) {
-    alert('모든 값을 입력해주세요.');
+  const errorMessage = validatePlanForm(planRegisterForm.value);
+  if (errorMessage) {
+    alert(errorMessage);
     return;
   }
 
@@ -675,6 +676,12 @@ const startUpdatePlan = (plan: Plan) => {
 };
 const handleUpdatePlan = async () => {
   if (!editingPlanId.value) return;
+
+  const errorMessage = validatePlanForm(planEditForm.value);
+  if (errorMessage) {
+    alert(errorMessage);
+    return;
+  }
 
   try {
     const data: UpdatePlanRequest = {
@@ -721,6 +728,27 @@ const handleDeletePlan = async (planId: number) => {
 /**
  * 기타
  */
+
+const validatePlanForm = (form: PlanForm) => {
+  const name = form.name;
+  const amount = form.amount;
+  const amountUnit = form.amountUnit;
+  const durationMonths = form.durationMonths;
+
+  if (!name || !amount == null || !amountUnit || !durationMonths == null) {
+    return '모든 값을 입력해주세요';
+  }
+  if (name.length > 10) {
+    return '이름은 최대 10자까지 가능합니다';
+  }
+  if (amount < 0) {
+    return '가격은 0원 이상이어야 합니다';
+  }
+  if (durationMonths < 1) {
+    return '기간은 1개월 이상이어야 합니다';
+  }
+  return null;
+};
 
 const formatAmount = (amount: number) => {
   return amount.toLocaleString();
