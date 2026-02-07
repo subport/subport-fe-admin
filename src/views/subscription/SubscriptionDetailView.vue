@@ -156,7 +156,6 @@
                     v-model="subscriptionEditForm.name"
                     type="text"
                     class="form-control"
-                    placeholder="예: Netflix"
                     required
                   />
                 </div>
@@ -246,7 +245,6 @@
                     v-model="planRegisterForm.name"
                     type="text"
                     class="form-control form-control-sm"
-                    placeholder="예: 프리미엄 플랜"
                     required
                   />
                 </td>
@@ -870,5 +868,11 @@ onMounted(() => {
   background-color: #5bb8ad;
   border-color: #5bb8ad;
   color: #000;
+}
+
+.form-select:focus,
+.form-control:focus {
+  border-color: #5bb8ad;
+  box-shadow: 0 0 0 3px rgba(111, 207, 195, 0.15);
 }
 </style>
