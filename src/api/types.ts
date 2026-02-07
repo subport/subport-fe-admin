@@ -33,7 +33,7 @@ export interface PlansResponse {
 export interface Plan {
   id: number;
   name: string;
-  amount: string;
+  amount: number;
   amountUnit: string;
   durationMonths: number;
   createdAt: string;
@@ -42,14 +42,14 @@ export interface Plan {
 
 export interface RegisterPlanRequest {
   name: string;
-  amount: string;
+  amount: number;
   amountUnit: string;
   durationMonths: number;
 }
 
 export interface UpdatePlanRequest {
   name: string;
-  amount: string;
+  amount: number;
   amountUnit: string;
   durationMonths: number;
 }
