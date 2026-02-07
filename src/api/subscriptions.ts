@@ -1,5 +1,6 @@
 import api from '.';
 import type {
+  RegisterSubscriptionRequest,
   Subscription,
   SubscriptionsResponse,
   UpdateSubscriptionRequest,
@@ -13,6 +14,34 @@ export function getSubscriptions() {
 
 export function getSubscription(subscriptionId: number) {
   return api.get<Subscription>(`${BASE}/${subscriptionId}`);
+}
+
+export function registerSubscription(
+  subscriptionId: number,
+  data: RegisterSubscriptionRequest,
+) {
+  const formData = new FormData();
+
+  const jsonBlob = new Blob(
+    [
+      JSON.stringify({
+        name: data.name,
+        type: data.type,
+        planUrl: data.planUrl || undefined,
+      }),
+    ],
+    { type: 'application/json' },
+  );
+
+  formData.append('request', jsonBlob);
+
+  if (data.image) {
+    formData.append('image', data.image);
+  }
+
+  return api.post(BASE, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 }
 
 export function updateSubscription(
@@ -34,11 +63,11 @@ export function updateSubscription(
 
   formData.append('request', jsonBlob);
 
-  if (data.logoImage) {
-    formData.append('logoImage', data.logoImage);
+  if (data.image) {
+    formData.append('image', data.image);
   }
 
-  return api.put<Subscription>(`${BASE}/${subscriptionId}`, formData, {
+  return api.put(`${BASE}/${subscriptionId}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 }

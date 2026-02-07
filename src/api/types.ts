@@ -16,14 +16,14 @@ export interface RegisterSubscriptionRequest {
   name: string;
   type: string;
   planUrl?: string;
-  logoImage?: File;
+  image?: File;
 }
 
 export interface UpdateSubscriptionRequest {
   name: string;
   type: string;
   planUrl?: string;
-  logoImage?: File;
+  image?: File;
 }
 
 export interface PlansResponse {
