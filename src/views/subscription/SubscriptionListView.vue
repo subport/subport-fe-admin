@@ -3,6 +3,13 @@
     <h3>구독 서비스 목록</h3>
   </div>
 
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- 구독 추가 버튼 -->
+    <button class="btn btn-sm btn-add" @click="startSaveSubscription">
+      <i class="bi bi-plus-circle"></i> 구독 서비스 추가
+    </button>
+  </div>
+
   <table class="table table-dark table-hover align-middle">
     <thead>
       <tr>
@@ -57,24 +64,221 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- 구독 추가 모달 -->
+  <div
+    v-if="isAddingSubscription"
+    class="modal d-block"
+    @click.self="isAddingSubscription = false"
+    @keydown.esc="close"
+    tabindex="-1"
+  >
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px">
+      <div class="modal-content text-white">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-plus-circle-fill"></i> 구독 서비스 추가
+          </h5>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            @click="close"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-3">
+            <!-- 이미지 업로드 -->
+            <div class="col-12 d-flex justify-content-center">
+              <div class="d-flex flex-column align-items-stretch">
+                <!-- 이미지 업로드 박스 -->
+                <div
+                  class="position-relative d-inline-flex justify-content-center align-items-center"
+                  style="
+                    width: 120px;
+                    height: 120px;
+                    border: 2px dashed #6fcfc3;
+                    border-radius: 8px;
+                    cursor: pointer;
+                  "
+                  @click="logoInput?.click()"
+                >
+                  <i
+                    v-if="!logoPreviewUrl"
+                    class="bi bi-plus-lg text-white fs-2"
+                  ></i>
+
+                  <!-- 미리보기 이미지 -->
+                  <img
+                    v-else
+                    :src="logoPreviewUrl"
+                    alt="logo preview"
+                    class="rounded-3"
+                    style="width: 120px; height: 120px; object-fit: cover"
+                  />
+                </div>
+
+                <!-- 숨겨진 파일 입력 -->
+                <input
+                  ref="logoInput"
+                  type="file"
+                  class="d-none"
+                  accept="image/*"
+                  @change="changeLogo"
+                />
+              </div>
+            </div>
+
+            <div class="col-12 col-sm-12">
+              <label for="name" class="form-label">
+                서비스명 <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                required
+                v-model="subscriptionRegisterForm.name"
+              />
+            </div>
+            <div class="col-12 col-sm-12">
+              <label for="type" class="form-label">
+                타입 <span class="text-danger">*</span>
+              </label>
+              <select
+                id="type"
+                class="form-select"
+                required
+                v-model="subscriptionRegisterForm.type"
+              >
+                <option value="">선택</option>
+                <option
+                  v-for="type in SUBSCRIPTION_TYPES"
+                  :key="type"
+                  :value="type"
+                >
+                  {{ type }}
+                </option>
+              </select>
+            </div>
+            <div class="col-12 col-sm-12">
+              <label for="planUrl" class="form-label"> 플랜 페이지 URL </label>
+              <input
+                type="url"
+                class="form-control"
+                placeholder="https://example.com/pricing"
+                v-model="subscriptionRegisterForm.planUrl"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-sm btn-add" @click="saveSubscription">
+              <i class="bi bi-check-lg"></i> 저장
+            </button>
+            <button
+              class="btn btn-secondary btn-sm btn-cancel"
+              @click="cancelSaveSubscription"
+            >
+              <i class="bi bi-x-lg"></i> 취소
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { getSubscriptions } from '@/api/subscriptions';
+import { getSubscriptions, registerSubscription } from '@/api/subscriptions';
 import { onMounted, ref } from 'vue';
-import type { Subscription } from '@/api/types';
+import {
+  SUBSCRIPTION_TYPES,
+  type RegisterSubscriptionRequest,
+  type Subscription,
+} from '@/api/types';
 import { useRouter } from 'vue-router';
 
-const subscriptions = ref<Subscription[]>([]);
-
 const router = useRouter();
-const goSubscriptionDetail = (id: number) => {
-  router.push(`/subscriptions/${id}`);
-};
 
+// Reactive 상태
+const subscriptionRegisterForm = ref({
+  name: '',
+  type: '',
+  planUrl: '',
+  logoImageUrl: '',
+});
+const subscriptions = ref<Subscription[]>([]);
+const selectedLogoFile = ref<File | null>(null);
+const logoPreviewUrl = ref<string | null>(null);
+const logoInput = ref<HTMLInputElement | null>(null);
+const isAddingSubscription = ref(false);
+
+// 함수
 const fetchSubscriptions = async () => {
   const response = await getSubscriptions();
   subscriptions.value = response.data.subscriptions;
+};
+
+const startSaveSubscription = () => {
+  isAddingSubscription.value = true;
+  subscriptionRegisterForm.value = {
+    name: '',
+    type: '',
+    logoImageUrl: '',
+    planUrl: '',
+  };
+};
+const changeLogo = (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0] || null;
+  selectedLogoFile.value = file;
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      logoPreviewUrl.value = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  } else {
+    logoPreviewUrl.value = null; // 취소 시 기존 이미지로 복구
+  }
+};
+const saveSubscription = async () => {
+  if (subscriptionRegisterForm.value.name.length > 10) {
+    alert('이름은 최대 10자까지 가능합니다.');
+    return;
+  }
+
+  try {
+    const formData: RegisterSubscriptionRequest = {
+      name: subscriptionRegisterForm.value.name,
+      type: subscriptionRegisterForm.value.type,
+      planUrl: subscriptionRegisterForm.value.planUrl || undefined,
+      image: selectedLogoFile.value || undefined,
+    };
+    await registerSubscription(formData);
+    alert('구독 서비스가 등록되었습니다.');
+    isAddingSubscription.value = false;
+    await fetchSubscriptions();
+  } catch (error) {
+    console.error('구독 서비스 등록 실패:', error);
+    alert('등록에 실패했습니다.');
+  }
+};
+const cancelSaveSubscription = () => {
+  isAddingSubscription.value = false;
+  subscriptionRegisterForm.value = {
+    name: '',
+    type: '',
+    logoImageUrl: '',
+    planUrl: '',
+  };
+};
+
+const close = () => {
+  isAddingSubscription.value = false;
+};
+
+const goSubscriptionDetail = (id: number) => {
+  router.push(`/subscriptions/${id}`);
 };
 
 onMounted(() => {
@@ -133,13 +337,59 @@ onMounted(() => {
   border-color: #5bb8ad;
 }
 
-.btn-delete {
-  background-color: #444;
-  border-color: #444;
+.btn-add {
+  background-color: #6fcfc3;
+  border-color: #6fcfc3;
+  color: #000;
+}
+
+.btn-add:hover {
+  background-color: #5bb8ad;
+  border-color: #5bb8ad;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  border-color: #6c757d;
   color: #fff;
 }
 
-.btn-delete:hover {
-  background-color: #666;
+.btn-cancel:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #313137;
+  border: 1px solid #444;
+}
+
+.modal-content input {
+  background-color: #fff;
+  color: #111;
+  border: 1px solid #555;
+}
+
+.modal-footer {
+  margin-top: 1rem;
+}
+
+.form-select:focus,
+.form-control:focus {
+  border-color: #5bb8ad;
+  box-shadow: 0 0 0 3px rgba(111, 207, 195, 0.15);
 }
 </style>
