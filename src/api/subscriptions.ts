@@ -1,5 +1,6 @@
 import api from '.';
 import type {
+  GetSubscriptionsParams,
   RegisterSubscriptionRequest,
   Subscription,
   SubscriptionsResponse,
@@ -8,8 +9,10 @@ import type {
 
 const BASE = '/subscriptions';
 
-export function getSubscriptions() {
-  return api.get<SubscriptionsResponse>(BASE);
+export function getSubscriptions(params?: GetSubscriptionsParams) {
+  return api.get<SubscriptionsResponse>(BASE, {
+    params,
+  });
 }
 
 export function getSubscription(subscriptionId: number) {

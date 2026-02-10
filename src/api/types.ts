@@ -12,6 +12,12 @@ export interface Subscription {
   lastModifiedAt: string;
 }
 
+export interface GetSubscriptionsParams {
+  type?: string;
+  sort?: string;
+  name?: string;
+}
+
 export interface RegisterSubscriptionRequest {
   name: string;
   type: string;
