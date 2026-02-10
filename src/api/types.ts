@@ -13,6 +13,8 @@ export interface Subscription {
 }
 
 export interface GetSubscriptionsParams {
+  page: number;
+  size: number;
   type?: string;
   sort?: string;
   name?: string;

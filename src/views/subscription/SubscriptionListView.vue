@@ -18,9 +18,9 @@
 
       <select v-model="sort" class="form-select form-select-sm select-sort">
         <option value="">기본순</option>
-        <option value="createdAt,desc">최근 등록순</option>
-        <option value="lastModifiedAt,desc">최근 수정순</option>
-        <option value="name,asc">이름순</option>
+        <option value="recent">최근 등록순</option>
+        <option value="updated">최근 수정순</option>
+        <option value="name">이름순</option>
       </select>
 
       <div class="input-group input-group-sm box-search">
@@ -243,20 +243,31 @@ const selectedLogoFile = ref<File | null>(null);
 const logoPreviewUrl = ref<string | null>(null);
 const logoInput = ref<HTMLInputElement | null>(null);
 const isAddingSubscription = ref(false);
+
+const SORT_MAP: Record<string, string> = {
+  '': 'id,asc',
+  recent: 'createdAt,desc',
+  updated: 'lastModifiedAt,desc',
+  name: 'name,asc',
+};
 const selectedType = ref('');
 const sort = ref('');
 const searchedName = ref('');
 const appliedName = ref('');
+const currentPage = ref(1);
 
 // 함수
 const fetchSubscriptions = async () => {
-  const params: GetSubscriptionsParams = {};
+  const params: GetSubscriptionsParams = {
+    page: currentPage.value - 1,
+    size: 10,
+  };
 
   if (selectedType.value) {
     params.type = selectedType.value;
   }
   if (sort.value) {
-    params.sort = sort.value;
+    params.sort = SORT_MAP[sort.value];
   }
   if (appliedName.value) {
     params.name = appliedName.value;
@@ -334,6 +345,7 @@ const handleSearch = () => {
 
   router.replace({
     query: {
+      ...(currentPage.value > 1 ? { page: String(currentPage.value) } : {}),
       type: selectedType.value || undefined,
       sort: sort.value || undefined,
       name: appliedName.value || undefined,
@@ -341,9 +353,12 @@ const handleSearch = () => {
   });
 };
 
-watch([selectedType, sort], () => {
+watch([currentPage, selectedType, sort], () => {
+  currentPage.value = 1;
+
   router.replace({
     query: {
+      ...(currentPage.value > 1 ? { page: String(currentPage.value) } : {}),
       type: selectedType.value || undefined,
       sort: sort.value || undefined,
       name: appliedName.value || undefined,
@@ -353,6 +368,7 @@ watch([selectedType, sort], () => {
 watch(
   () => route.query,
   query => {
+    currentPage.value = query.page ? Number(query.page) : 1;
     selectedType.value = (query.type as string) || '';
     sort.value = (query.sort as string) || '';
     appliedName.value = (query.name as string) || '';
