@@ -68,7 +68,9 @@
             class="rounded"
           />
         </td>
-        <td class="name-col">{{ subscription.name }}</td>
+        <td class="name-col" :title="subscription.name">
+          {{ subscription.name }}
+        </td>
         <td class="plan-url-col">
           <a
             v-if="subscription.planUrl"
@@ -564,7 +566,7 @@ onMounted(() => {
 }
 
 .page-item.disabled .page-link {
-  color: #aaa; /* 흐린 회색 */
+  color: #aaa;
   cursor: not-allowed;
 }
 
@@ -575,6 +577,9 @@ onMounted(() => {
 .page-link-prev,
 .page-link-next {
   color: #6fcfc3;
+}
+.pagination .page-link:focus {
+  box-shadow: none;
 }
 
 .pagination .page-item.active .page-link {
