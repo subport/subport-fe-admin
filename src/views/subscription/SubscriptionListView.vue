@@ -1,11 +1,41 @@
 <template>
-  <div class="page-title mb-4">
-    <h3>구독 서비스 목록</h3>
+  <div class="page-title mb-3">
+    <h3 class="mb-0">구독 서비스 목록</h3>
   </div>
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <!-- 구독 추가 버튼 -->
-    <button class="btn btn-sm btn-add" @click="startSaveSubscription">
+  <!-- 필터 + 정렬 + 검색 + 구독 추가-->
+  <div class="d-flex align-items-center mb-4">
+    <div class="d-flex align-items-center gap-2">
+      <select
+        v-model="selectedType"
+        class="form-select form-select-sm select-type"
+      >
+        <option value="">전체</option>
+        <option v-for="type in SUBSCRIPTION_TYPES" :key="type" :value="type">
+          {{ type }}
+        </option>
+      </select>
+
+      <select v-model="sort" class="form-select form-select-sm select-sort">
+        <option value="">기본순</option>
+        <option value="createdAt,desc">최근 등록순</option>
+        <option value="lastModifiedAt,desc">최근 수정순</option>
+        <option value="name,asc">이름순</option>
+      </select>
+
+      <div class="input-group input-group-sm box-search">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="이름으로 검색"
+          v-model="searchedName"
+          @keyup.enter="handleSearch"
+        />
+        <button class="btn btn-search" @click="handleSearch">검색</button>
+      </div>
+    </div>
+
+    <button class="btn btn-sm btn-add ms-auto" @click="startSaveSubscription">
       <i class="bi bi-plus-circle"></i> 구독 서비스 추가
     </button>
   </div>
@@ -171,7 +201,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-sm btn-add" @click="saveSubscription">
+            <button class="btn btn-sm btn-save" @click="saveSubscription">
               <i class="bi bi-check-lg"></i> 저장
             </button>
             <button
@@ -189,15 +219,17 @@
 
 <script setup lang="ts">
 import { getSubscriptions, registerSubscription } from '@/api/subscriptions';
-import { onMounted, ref } from 'vue';
 import {
   SUBSCRIPTION_TYPES,
+  type GetSubscriptionsParams,
   type RegisterSubscriptionRequest,
   type Subscription,
 } from '@/api/types';
-import { useRouter } from 'vue-router';
+import { onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
+const route = useRoute();
 
 // Reactive 상태
 const subscriptionRegisterForm = ref({
@@ -211,10 +243,26 @@ const selectedLogoFile = ref<File | null>(null);
 const logoPreviewUrl = ref<string | null>(null);
 const logoInput = ref<HTMLInputElement | null>(null);
 const isAddingSubscription = ref(false);
+const selectedType = ref('');
+const sort = ref('');
+const searchedName = ref('');
+const appliedName = ref('');
 
 // 함수
 const fetchSubscriptions = async () => {
-  const response = await getSubscriptions();
+  const params: GetSubscriptionsParams = {};
+
+  if (selectedType.value) {
+    params.type = selectedType.value;
+  }
+  if (sort.value) {
+    params.sort = sort.value;
+  }
+  if (appliedName.value) {
+    params.name = appliedName.value;
+  }
+
+  const response = await getSubscriptions(params);
   subscriptions.value = response.data.subscriptions;
 };
 
@@ -281,6 +329,40 @@ const goSubscriptionDetail = (id: number) => {
   router.push(`/subscriptions/${id}`);
 };
 
+const handleSearch = () => {
+  appliedName.value = searchedName.value;
+
+  router.replace({
+    query: {
+      type: selectedType.value || undefined,
+      sort: sort.value || undefined,
+      name: appliedName.value || undefined,
+    },
+  });
+};
+
+watch([selectedType, sort], () => {
+  router.replace({
+    query: {
+      type: selectedType.value || undefined,
+      sort: sort.value || undefined,
+      name: appliedName.value || undefined,
+    },
+  });
+});
+watch(
+  () => route.query,
+  query => {
+    selectedType.value = (query.type as string) || '';
+    sort.value = (query.sort as string) || '';
+    appliedName.value = (query.name as string) || '';
+    searchedName.value = appliedName.value;
+
+    fetchSubscriptions();
+  },
+  { immediate: true },
+);
+
 onMounted(() => {
   fetchSubscriptions();
 });
@@ -326,26 +408,30 @@ onMounted(() => {
   text-decoration: underline;
 }
 
-.btn-detail {
+.btn-detail,
+.btn-save,
+.btn-search {
   background-color: #6fcfc3;
   border-color: #6fcfc3;
   color: #000;
 }
 
-.btn-detail:hover {
+.btn-detail:hover,
+.btn-save:hover,
+.btn-search:hover {
   background-color: #5bb8ad;
   border-color: #5bb8ad;
 }
 
 .btn-add {
-  background-color: #6fcfc3;
-  border-color: #6fcfc3;
+  background-color: #b2b4b6;
+  border-color: #b2b4b6;
   color: #000;
 }
 
 .btn-add:hover {
-  background-color: #5bb8ad;
-  border-color: #5bb8ad;
+  background-color: #9da0a3;
+  border-color: #9da0a3;
 }
 
 .btn-cancel {
@@ -391,5 +477,17 @@ onMounted(() => {
 .form-control:focus {
   border-color: #5bb8ad;
   box-shadow: 0 0 0 3px rgba(111, 207, 195, 0.15);
+}
+
+.select-type {
+  width: 150px;
+}
+
+.select-sort {
+  width: 120px;
+}
+
+.box-search {
+  width: 200px;
 }
 </style>
