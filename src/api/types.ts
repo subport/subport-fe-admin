@@ -1,5 +1,8 @@
 export interface SubscriptionsResponse {
   subscriptions: Subscription[];
+  currentPage: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 export interface Subscription {
