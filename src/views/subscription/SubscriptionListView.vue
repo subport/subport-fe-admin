@@ -95,6 +95,45 @@
     </tbody>
   </table>
 
+  <!-- 페이지네이션  -->
+  <nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" :class="{ disabled: currentPage <= 1 }">
+        <a
+          class="page-link page-link-prev"
+          href="#"
+          aria-label="Previous"
+          @click.prevent="currentPage > 1 && currentPage--"
+        >
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li
+        v-for="page in totalPages"
+        :key="page"
+        class="page-item"
+        :class="{ active: currentPage === page }"
+      >
+        <a
+          class="page-link page-number"
+          href="#"
+          @click.prevent="currentPage = page"
+          >{{ page }}</a
+        >
+      </li>
+      <li class="page-item" :class="{ disabled: currentPage >= totalPages }">
+        <a
+          class="page-link page-link-next"
+          href="#"
+          aria-label="Next"
+          @click.prevent="currentPage < totalPages && currentPage++"
+        >
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
   <!-- 구독 추가 모달 -->
   <div
     v-if="isAddingSubscription"
@@ -224,6 +263,7 @@ import {
   type GetSubscriptionsParams,
   type RegisterSubscriptionRequest,
   type Subscription,
+  type SubscriptionsResponse,
 } from '@/api/types';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -255,6 +295,8 @@ const sort = ref('');
 const searchedName = ref('');
 const appliedName = ref('');
 const currentPage = ref(1);
+const totalElements = ref(0);
+const totalPages = ref(0);
 
 // 함수
 const fetchSubscriptions = async () => {
@@ -274,7 +316,12 @@ const fetchSubscriptions = async () => {
   }
 
   const response = await getSubscriptions(params);
-  subscriptions.value = response.data.subscriptions;
+  const data = response.data as SubscriptionsResponse;
+
+  subscriptions.value = data.subscriptions;
+  currentPage.value = data.currentPage;
+  totalElements.value = data.totalElements;
+  totalPages.value = data.totalPages;
 };
 
 const startSaveSubscription = () => {
@@ -354,8 +401,6 @@ const handleSearch = () => {
 };
 
 watch([currentPage, selectedType, sort], () => {
-  currentPage.value = 1;
-
   router.replace({
     query: {
       ...(currentPage.value > 1 ? { page: String(currentPage.value) } : {}),
@@ -409,6 +454,13 @@ onMounted(() => {
 .updated-at-col,
 .action-col {
   text-align: center;
+}
+
+.name-col {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .link-color {
@@ -505,5 +557,33 @@ onMounted(() => {
 
 .box-search {
   width: 200px;
+}
+
+.page-item {
+  margin: 0 4px;
+}
+
+.page-item.disabled .page-link {
+  color: #aaa; /* 흐린 회색 */
+  cursor: not-allowed;
+}
+
+.page-number {
+  color: #000;
+}
+
+.page-link-prev,
+.page-link-next {
+  color: #6fcfc3;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #6fcfc3;
+  border-color: #6fcfc3;
+  color: #000;
+}
+
+.pagination .page-link:hover {
+  border-color: #aaa;
 }
 </style>
