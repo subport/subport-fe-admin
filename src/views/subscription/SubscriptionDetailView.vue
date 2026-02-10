@@ -3,7 +3,7 @@
     <h3>구독 서비스 상세</h3>
   </div>
 
-  <div class="container mt-4">
+  <div class="container-fluid mt-4">
     <div class="card shadow-sm">
       <div class="card-body">
         <!-- 읽기 모드 -->
@@ -432,24 +432,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { deletePlan, getPlans, registerPlan, updatePlan } from '@/api/plans';
 import {
   deleteSubscription,
   getSubscription,
   updateSubscription,
 } from '@/api/subscriptions';
-import { deletePlan, getPlans, registerPlan, updatePlan } from '@/api/plans';
 import {
-  type Subscription,
   type Plan,
+  type PlanForm,
   type RegisterPlanRequest,
+  type Subscription,
   type UpdatePlanRequest,
   type UpdateSubscriptionRequest,
-  type PlanForm,
   AMOUNT_UNITS,
   SUBSCRIPTION_TYPES,
 } from '@/api/types';
+import { onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
@@ -787,8 +787,18 @@ onMounted(() => {
   white-space: nowrap;
 }
 
+.btn-add {
+  background-color: #b2b4b6;
+  border-color: #b2b4b6;
+  color: #000;
+}
+
+.btn-add:hover {
+  background-color: #9da0a3;
+  border-color: #9da0a3;
+}
+
 .btn-update,
-.btn-add,
 .btn-save {
   background-color: #6fcfc3;
   border-color: #6fcfc3;
@@ -796,7 +806,6 @@ onMounted(() => {
 }
 
 .btn-update:hover,
-.btn-add:hover,
 .btn-save:hover {
   background-color: #5bb8ad;
   border-color: #5bb8ad;
