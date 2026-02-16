@@ -72,6 +72,17 @@ export interface PlanForm {
   durationMonths: number;
 }
 
+// 대시보드
+export interface DashboardStatsResponse {
+  totalMemberCount: number;
+  weeklyNewMemberCount: number;
+  todayNewMemberCount: number;
+  yesterdayNewMemberCount: number;
+  totalMemberSubscriptionCount: number;
+  weeklyNewMemberSubscriptionCount: number;
+  currentActiveMemberCount: number;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
