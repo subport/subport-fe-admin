@@ -90,7 +90,7 @@
             <!-- 바 영역 -->
             <div class="bar-chart-body">
               <div
-                v-for="(item, i) in signupData"
+                v-for="(item, i) in signupBars"
                 :key="i"
                 class="bar-col"
                 @mouseenter="hoveredBar = i"
@@ -122,7 +122,7 @@
             <!-- 날짜 레이블 바닥 고정 -->
             <div class="bar-labels">
               <span
-                v-for="(item, i) in signupData"
+                v-for="(item, i) in signupBars"
                 :key="i"
                 class="bar-label"
                 :class="{ today: item.isToday }"
@@ -414,14 +414,14 @@
 </template>
 
 <script setup lang="ts">
-import { getStats } from '@/api/dashboard';
-import type { DashboardStatsResponse } from '@/api/types';
+import { getSignUpTrend, getStats } from '@/api/dashboard';
+import type { DashboardStatsResponse, SignupTrendResponse } from '@/api/types';
 import type {
   CustomService,
   NotificationStats,
   RecentMember,
   RecentNotification,
-  SignupData,
+  SignupBar,
   StatCard,
   TopService,
 } from '@/types/dashboard';
@@ -492,22 +492,21 @@ function buildStatCards(data: DashboardStatsResponse): StatCard[] {
   ];
 }
 
-const signupData = ref<SignupData[]>([
-  { label: '2/1', value: 4, isToday: false },
-  { label: '2/2', value: 6, isToday: false },
-  { label: '2/3', value: 3, isToday: false },
-  { label: '2/4', value: 8, isToday: false },
-  { label: '2/5', value: 5, isToday: false },
-  { label: '2/6', value: 11, isToday: false },
-  { label: '2/7', value: 7, isToday: false },
-  { label: '2/8', value: 9, isToday: false },
-  { label: '2/9', value: 4, isToday: false },
-  { label: '2/10', value: 13, isToday: false },
-  { label: '2/11', value: 6, isToday: false },
-  { label: '2/12', value: 10, isToday: false },
-  { label: '2/13', value: 7, isToday: false },
-  { label: '2/14', value: 7, isToday: true },
-]);
+const signupBars = ref<SignupBar[]>([]);
+
+function buildSignupBars(data: SignupTrendResponse): SignupBar[] {
+  const today = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+  }).format(new Date());
+  return data.signupTrends.map(item => {
+    const [, m, d] = item.date.split('-');
+    return {
+      label: `${Number(m)}/${Number(d)}`,
+      value: item.newMemberCount,
+      isToday: item.date === today,
+    };
+  });
+}
 
 const recentMembers = ref<RecentMember[]>([
   {
@@ -612,7 +611,7 @@ const todayFormatted = computed<string>(() => {
 });
 
 const maxSignup = computed<number>(() =>
-  Math.max(...signupData.value.map(d => d.value)),
+  Math.max(...signupBars.value.map(d => d.value)),
 );
 
 // ── 유틸 함수 ─────────────────────────────────────
@@ -693,20 +692,28 @@ async function fetchStats(): Promise<void> {
   try {
     const { data } = await getStats();
     statCards.value = buildStatCards(data);
-    lastUpdated.value = '방금 전';
   } catch (e) {
     console.error('대시보드 통계 조회 실패', e);
   }
 }
 
+async function fetchSignupBars(): Promise<void> {
+  try {
+    const { data } = await getSignUpTrend();
+    signupBars.value = buildSignupBars(data);
+  } catch (e) {
+    console.error('신규 가입자 추이 조회 실패', e);
+  }
+}
+
 async function refreshData(): Promise<void> {
   isRefreshing.value = true;
-  await fetchStats();
+  await Promise.all([fetchStats(), fetchSignupBars()]);
   isRefreshing.value = false;
 }
 
 onMounted(() => {
-  fetchStats();
+  Promise.all([fetchStats(), fetchSignupBars()]);
 });
 </script>
 
@@ -968,7 +975,7 @@ onMounted(() => {
   background: rgba(111, 207, 195, 0.25);
   min-height: 4px;
   animation: growUp 0.6s ease both;
-  transition: background 0.2s;
+  transition: background-color 0.2s;
   position: relative;
 }
 .bar-fill.highlight {
