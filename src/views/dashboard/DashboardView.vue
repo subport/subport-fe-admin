@@ -414,8 +414,8 @@
 </template>
 
 <script setup lang="ts">
-import { getSignUpTrend, getStats } from '@/api/dashboard';
-import type { DashboardStatsResponse, SignupTrendResponse } from '@/api/types';
+import { getRecentMembers, getSignUpTrend, getStats } from '@/api/dashboard';
+import type { DashboardStatsResponse, SignupTrendsResponse } from '@/api/types';
 import type {
   CustomService,
   NotificationStats,
@@ -494,7 +494,7 @@ function buildStatCards(data: DashboardStatsResponse): StatCard[] {
 
 const signupBars = ref<SignupBar[]>([]);
 
-function buildSignupBars(data: SignupTrendResponse): SignupBar[] {
+function buildSignupBars(data: SignupTrendsResponse): SignupBar[] {
   const today = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Seoul',
   }).format(new Date());
@@ -508,38 +508,7 @@ function buildSignupBars(data: SignupTrendResponse): SignupBar[] {
   });
 }
 
-const recentMembers = ref<RecentMember[]>([
-  {
-    nickname: '김민준',
-    email: 'minjun@email.com',
-    subsCount: 3,
-    createdAt: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
-  },
-  {
-    nickname: 'dogdog',
-    email: 'dogdog@email.com',
-    subsCount: 5,
-    createdAt: new Date(Date.now() - 1000 * 60 * 70).toISOString(),
-  },
-  {
-    nickname: '박지호',
-    email: 'jiho@email.com',
-    subsCount: 2,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-  },
-  {
-    nickname: '최수아',
-    email: 'sua@email.com',
-    subsCount: 4,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 30).toISOString(),
-  },
-  {
-    nickname: 'alice99',
-    email: 'alice@email.com',
-    subsCount: 6,
-    createdAt: '2025-08-13T09:22:00.000Z',
-  },
-]);
+const recentMembers = ref<RecentMember[]>([]);
 
 const notificationStats = ref<NotificationStats>({
   sent: 142,
@@ -706,14 +675,23 @@ async function fetchSignupBars(): Promise<void> {
   }
 }
 
+async function fetchRecentMembers(): Promise<void> {
+  try {
+    const { data } = await getRecentMembers();
+    recentMembers.value = data.members;
+  } catch (e) {
+    console.error('최근 가입 회원 조회 실패', e);
+  }
+}
+
 async function refreshData(): Promise<void> {
   isRefreshing.value = true;
-  await Promise.all([fetchStats(), fetchSignupBars()]);
+  await Promise.all([fetchStats(), fetchSignupBars(), fetchRecentMembers()]);
   isRefreshing.value = false;
 }
 
 onMounted(() => {
-  Promise.all([fetchStats(), fetchSignupBars()]);
+  Promise.all([fetchStats(), fetchSignupBars(), fetchRecentMembers()]);
 });
 </script>
 
