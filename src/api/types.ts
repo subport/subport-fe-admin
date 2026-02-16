@@ -83,6 +83,15 @@ export interface DashboardStatsResponse {
   currentActiveMemberCount: number;
 }
 
+export interface SignupTrendResponse {
+  signupTrends: SignupTrend[];
+}
+
+export interface SignupTrend {
+  date: string;
+  newMemberCount: number;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
