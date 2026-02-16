@@ -83,13 +83,24 @@ export interface DashboardStatsResponse {
   currentActiveMemberCount: number;
 }
 
-export interface SignupTrendResponse {
+export interface SignupTrendsResponse {
   signupTrends: SignupTrend[];
 }
 
 export interface SignupTrend {
   date: string;
   newMemberCount: number;
+}
+
+export interface RecentMembersResponse {
+  members: RecentMember[];
+}
+
+export interface RecentMember {
+  nickname: string;
+  email: string;
+  memberSubscriptionCount: number;
+  createdAt: string;
 }
 
 // 상수
