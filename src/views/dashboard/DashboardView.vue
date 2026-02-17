@@ -168,10 +168,8 @@
                   stroke="currentColor"
                   stroke-width="2.5"
                 >
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7v5l3 2" />
                 </svg>
               </span>
               <span class="card-title-text">최근 가입 회원</span>
@@ -297,9 +295,8 @@
                     stroke="currentColor"
                     stroke-width="2.5"
                   >
-                    <rect x="2" y="3" width="20" height="14" rx="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" />
-                    <line x1="12" y1="17" x2="12" y2="21" />
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <line x1="2" y1="10" x2="22" y2="10" />
                   </svg>
                 </span>
                 <span class="card-title-text">구독 서비스 등록 현황</span>
@@ -366,10 +363,8 @@
                     stroke="currentColor"
                     stroke-width="2.5"
                   >
-                    <path d="M12 20h9" />
-                    <path
-                      d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
-                    />
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <line x1="2" y1="10" x2="22" y2="10" />
                   </svg>
                 </span>
                 <span class="card-title-text">커스텀 구독 서비스 현황</span>
@@ -507,7 +502,7 @@ function buildStatCards(data: DashboardStatsResponse): StatCard[] {
       sub: '이번 주 신규 등록',
       iconClass: 'icon-purple',
       showTrend: true,
-      iconPaths: ['M2 3h20v14H2z', 'M8 21h8', 'M12 17v4'],
+      iconPaths: ['M2 5h20v14H2z', 'M2 10h20'],
     },
     {
       label: '활성 유저 (최근 30일 이내 활동)',
