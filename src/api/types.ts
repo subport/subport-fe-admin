@@ -122,6 +122,21 @@ export interface TopCustomSubscription {
   memberSubscriptionCount: number;
 }
 
+export interface TodayEmailNotificationsResponse {
+  notifications: TodayEmailNotification[];
+  successCount: number;
+  failedCount: number;
+  pendingCount: number;
+}
+
+export interface TodayEmailNotification {
+  recipientEmail: string;
+  subscriptionCount: number;
+  daysBeforePayment: number;
+  status: string;
+  sentAt: string;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
