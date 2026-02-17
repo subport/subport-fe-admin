@@ -24,8 +24,9 @@
 
     <!-- 필터 바 -->
     <div class="filter-bar">
-      <div class="filter-left">
-        <!-- 타입 필터 -->
+      <!-- 타입 필터 -->
+      <div class="filter-group">
+        <label class="filter-label">타입</label>
         <div class="select-wrap">
           <svg
             width="13"
@@ -36,7 +37,10 @@
             stroke-width="2.5"
             class="select-icon"
           >
-            <path d="M22 3H2l8 9.46V19l4 2v-8.54z" />
+            <path
+              d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+            />
+            <line x1="7" y1="7" x2="7.01" y2="7" />
           </svg>
           <select v-model="selectedType" class="custom-select">
             <option value="">전체 타입</option>
@@ -49,54 +53,74 @@
             </option>
           </select>
         </div>
+      </div>
 
-        <!-- 정렬 -->
-        <div class="select-wrap">
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            class="select-icon"
+      <!-- 정렬 -->
+      <div class="filter-group">
+        <label class="filter-label">정렬</label>
+        <div class="status-tabs">
+          <button
+            v-for="tab in sortTabs"
+            :key="tab.value"
+            class="status-tab"
+            :class="{ active: sort === tab.value }"
+            @click="onSortChange(tab.value)"
           >
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="15" y2="12" />
-            <line x1="3" y1="18" x2="9" y2="18" />
-          </svg>
-          <select v-model="sort" class="custom-select">
-            <option value="">기본순</option>
-            <option value="recent">최근 등록순</option>
-            <option value="updated">최근 수정순</option>
-            <option value="name">이름순</option>
-          </select>
+            {{ tab.label }}
+          </button>
         </div>
       </div>
 
       <!-- 검색 -->
-      <div class="search-wrap">
+      <div class="filter-group search-group">
+        <label class="filter-label">이름 검색</label>
+        <div class="search-wrap">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            class="search-icon"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            v-model="searchedName"
+            type="text"
+            class="search-input"
+            placeholder="이름으로 검색"
+            @keyup.enter="handleSearch"
+          />
+          <button class="search-btn" @click="handleSearch">검색</button>
+        </div>
+      </div>
+
+      <!-- 초기화 -->
+      <button class="reset-btn" @click="resetFilters">
         <svg
-          width="14"
-          height="14"
+          width="13"
+          height="13"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="2.5"
-          class="search-icon"
         >
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          <polyline points="1 4 1 10 7 10" />
+          <path d="M3.51 15a9 9 0 1 0 .49-4.63" />
         </svg>
-        <input
-          v-model="searchedName"
-          type="text"
-          class="search-input"
-          placeholder="이름으로 검색"
-          @keyup.enter="handleSearch"
-        />
-        <button class="search-btn" @click="handleSearch">검색</button>
-      </div>
+        초기화
+      </button>
+    </div>
+
+    <!-- 결과 요약 -->
+    <div class="result-summary">
+      <span class="result-count"
+        >총 <strong>{{ totalElements }}</strong
+        >건</span
+      >
     </div>
 
     <!-- 테이블 -->
@@ -115,6 +139,22 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="subscriptions.length === 0">
+            <td colspan="8" class="empty-cell">
+              <svg
+                width="36"
+                height="36"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+              <span>조회된 구독 서비스가 없어요</span>
+            </td>
+          </tr>
           <tr
             v-for="subscription in subscriptions"
             :key="subscription.id"
@@ -190,7 +230,7 @@
       <button
         class="page-btn"
         :disabled="currentPage <= 1"
-        @click.prevent="currentPage > 1 && currentPage--"
+        @click="goToPage(currentPage - 1)"
       >
         <svg
           width="14"
@@ -203,19 +243,21 @@
           <polyline points="15 18 9 12 15 6" />
         </svg>
       </button>
-      <button
-        v-for="page in totalPages"
-        :key="page"
-        class="page-btn"
-        :class="{ active: currentPage === page }"
-        @click.prevent="currentPage = page"
-      >
-        {{ page }}
-      </button>
+      <template v-for="p in pageNumbers" :key="p">
+        <button v-if="p === '...'" class="page-btn ellipsis">···</button>
+        <button
+          v-else
+          class="page-btn"
+          :class="{ active: currentPage === p }"
+          @click="goToPage(p as number)"
+        >
+          {{ p }}
+        </button>
+      </template>
       <button
         class="page-btn"
         :disabled="currentPage >= totalPages"
-        @click.prevent="currentPage < totalPages && currentPage++"
+        @click="goToPage(currentPage + 1)"
       >
         <svg
           width="14"
@@ -381,7 +423,7 @@ import {
   type Subscription,
   type SubscriptionsResponse,
 } from '@/api/types';
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -405,6 +447,13 @@ const SORT_MAP: Record<string, string> = {
   updated: 'lastModifiedAt,desc',
   name: 'name,asc',
 };
+
+const sortTabs = [
+  { label: '기본', value: '' },
+  { label: '최근 등록순', value: 'recent' },
+  { label: '최근 수정순', value: 'updated' },
+  { label: '이름순', value: 'name' },
+] as const;
 
 const selectedType = ref('');
 const sort = ref('');
@@ -496,6 +545,35 @@ const goSubscriptionDetail = (id: number) => {
   router.push(`/subscriptions/${id}`);
 };
 
+const onSortChange = (value: string) => {
+  sort.value = value;
+  currentPage.value = 1;
+  router.replace({
+    query: {
+      ...(currentPage.value > 1 ? { page: String(currentPage.value) } : {}),
+      type: selectedType.value || undefined,
+      sort: sort.value || undefined,
+      name: appliedName.value || undefined,
+    },
+  });
+};
+
+const resetFilters = () => {
+  selectedType.value = '';
+  sort.value = '';
+  searchedName.value = '';
+  appliedName.value = '';
+  currentPage.value = 1;
+  router.replace({
+    query: {},
+  });
+};
+
+const goToPage = (page: number) => {
+  if (page < 1 || page > totalPages.value) return;
+  currentPage.value = page;
+};
+
 const handleSearch = () => {
   appliedName.value = searchedName.value;
   router.replace({
@@ -534,6 +612,20 @@ watch(
 
 onMounted(() => {
   fetchSubscriptions();
+});
+
+// ── 페이지 번호 계산 ──────────────────────────────
+const pageNumbers = computed<(number | string)[]>(() => {
+  const total = totalPages.value;
+  const cur = currentPage.value;
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | string)[] = [1];
+  if (cur > 3) pages.push('...');
+  for (let p = Math.max(2, cur - 1); p <= Math.min(total - 1, cur + 1); p++)
+    pages.push(p);
+  if (cur < total - 2) pages.push('...');
+  pages.push(total);
+  return pages;
 });
 </script>
 
@@ -603,19 +695,29 @@ onMounted(() => {
 /* ── 필터 바 ─────────────────────────────────────── */
 .filter-bar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: flex-end;
+  gap: 20px;
   flex-wrap: wrap;
   background: var(--bg-surface);
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid var(--border);
-  padding: 14px 18px;
-  margin-bottom: 16px;
+  padding: 18px 20px;
+  margin-bottom: 25px;
 }
-.filter-left {
+.filter-group {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
+}
+.filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+.search-group {
+  flex: 1;
+  min-width: 200px;
 }
 
 /* 셀렉트 */
@@ -635,12 +737,17 @@ onMounted(() => {
   padding: 7px 32px 7px 30px;
   background: var(--bg-raised);
   border: 1px solid var(--border-mid);
-  border-radius: 8px;
+  border-radius: 7px;
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: 12px;
   font-family: inherit;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: all 0.15s;
+  height: 32px;
+  box-sizing: border-box;
+}
+.custom-select:hover {
+  background: var(--bg-hover);
 }
 .custom-select:focus {
   outline: none;
@@ -649,19 +756,38 @@ onMounted(() => {
 .custom-select option {
   background: var(--bg-raised);
 }
-.full {
-  width: 100%;
+
+/* 정렬 탭 */
+.status-tabs {
+  display: flex;
+  gap: 4px;
+}
+.status-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 7px;
+  border: 1px solid var(--border-mid);
+  background: var(--bg-raised);
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+  height: 32px;
   box-sizing: border-box;
 }
-.select-wrap.full {
-  display: block;
-  width: 100%;
+.status-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
-/* 모달 안 셀렉트: 아이콘 없으므로 좌측 패딩을 일반 인풋과 동일하게 */
-.select-wrap.full .custom-select {
-  padding-left: 12px;
-  width: 100%;
-  box-sizing: border-box;
+.status-tab.active {
+  background: var(--mint);
+  color: #0f1115;
+  border-color: var(--mint);
+  font-weight: 700;
 }
 
 /* 검색 */
@@ -672,27 +798,28 @@ onMounted(() => {
 }
 .search-icon {
   position: absolute;
-  left: 11px;
+  left: 10px;
   color: var(--text-muted);
   pointer-events: none;
 }
 .search-input {
-  padding: 7px 90px 7px 32px;
-  background: var(--bg-raised);
-  border: 1px solid var(--border-mid);
+  width: 100%;
+  padding: 0 90px 0 32px;
   border-radius: 8px;
-  color: var(--text-primary);
+  border: 1px solid var(--border-mid);
+  background: var(--bg-raised);
   font-size: 13px;
+  color: var(--text-primary);
   font-family: inherit;
-  width: 220px;
-  transition: border-color 0.15s;
+  box-sizing: border-box;
+  height: 32px;
+}
+.search-input::placeholder {
+  color: var(--text-muted);
 }
 .search-input:focus {
   outline: none;
   border-color: var(--mint);
-}
-.search-input::placeholder {
-  color: var(--text-muted);
 }
 .search-btn {
   position: absolute;
@@ -706,10 +833,66 @@ onMounted(() => {
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: background 0.15s;
+  transition: background-color 0.15s;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .search-btn:hover {
   background: var(--mint-dim);
+}
+
+/* 초기화 버튼 */
+.reset-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: 7px;
+  border: 1px solid var(--border-mid);
+  background: var(--bg-raised);
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  align-self: flex-end;
+  height: 32px;
+  box-sizing: border-box;
+}
+.reset-btn:hover {
+  background: rgba(250, 82, 82, 0.1);
+  color: #ff6b6b;
+  border-color: rgba(250, 82, 82, 0.3);
+}
+
+/* ── 결과 요약 ───────────────────────────────────── */
+.result-summary {
+  margin-bottom: 13px;
+}
+.result-count {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.result-count strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* 모달 안 셀렉트: 아이콘 없으므로 좌측 패딩을 일반 인풋과 동일하게 */
+.select-wrap.full {
+  display: block;
+  width: 100%;
+}
+.select-wrap.full .custom-select {
+  padding-left: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.full {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── 테이블 ──────────────────────────────────────── */
@@ -741,7 +924,7 @@ onMounted(() => {
 
 .data-row {
   border-bottom: 1px solid var(--border);
-  transition: background 0.15s;
+  transition: background-color 0.15s;
 }
 .data-row:last-child {
   border-bottom: none;
@@ -757,6 +940,22 @@ onMounted(() => {
   vertical-align: middle;
 }
 
+.empty-cell {
+  text-align: center !important;
+  padding: 52px 0 !important;
+  color: var(--text-muted);
+}
+.empty-cell svg {
+  opacity: 0.25;
+  margin-bottom: 10px;
+  display: block;
+  margin-inline: auto;
+}
+.empty-cell span {
+  font-size: 14px;
+  display: block;
+}
+
 /* 컬럼 너비 */
 .col-id {
   width: 60px;
@@ -764,10 +963,10 @@ onMounted(() => {
   font-size: 12px !important;
 }
 .col-type {
-  width: 100px;
+  width: 130px;
 }
 .col-logo {
-  width: 72px;
+  width: 90px;
 }
 .col-name {
   max-width: 160px;
@@ -866,8 +1065,8 @@ onMounted(() => {
   border-radius: 8px;
   border: 1px solid var(--border-mid);
   background: var(--bg-surface);
-  color: var(--text-secondary);
   font-size: 13px;
+  color: var(--text-secondary);
   cursor: pointer;
   font-family: inherit;
   display: flex;
@@ -875,7 +1074,7 @@ onMounted(() => {
   justify-content: center;
   transition: all 0.15s;
 }
-.page-btn:hover:not(:disabled) {
+.page-btn:hover:not(:disabled):not(.ellipsis) {
   background: var(--bg-raised);
   color: var(--text-primary);
 }
@@ -888,6 +1087,12 @@ onMounted(() => {
 .page-btn:disabled {
   opacity: 0.3;
   cursor: default;
+}
+.page-btn.ellipsis {
+  border: none;
+  background: none;
+  cursor: default;
+  color: var(--text-muted);
 }
 
 /* ── 모달 ────────────────────────────────────────── */
@@ -977,7 +1182,7 @@ onMounted(() => {
   color: var(--text-muted);
   transition:
     border-color 0.15s,
-    background 0.15s;
+    background-color 0.15s;
   overflow: hidden;
 }
 .logo-upload-box:hover {
@@ -1066,7 +1271,7 @@ onMounted(() => {
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  transition: background 0.15s;
+  transition: background-color 0.15s;
 }
 .btn-modal-save:hover {
   background: var(--mint-dim);
