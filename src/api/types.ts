@@ -103,6 +103,25 @@ export interface RecentMember {
   createdAt: string;
 }
 
+export interface TopSubscriptionsResponse {
+  topSubscriptions: TopSubscription[];
+}
+
+export interface TopSubscription {
+  subscriptionName: string;
+  subscriptionLogoImageUrl: string;
+  memberSubscriptionCount: number;
+}
+
+export interface TopCustomSubscriptionsResponse {
+  topCustomSubscriptions: TopCustomSubscription[];
+}
+
+export interface TopCustomSubscription {
+  normalizedSubscriptionName: string;
+  memberSubscriptionCount: number;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
