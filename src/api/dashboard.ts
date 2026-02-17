@@ -3,6 +3,8 @@ import type {
   DashboardStatsResponse,
   RecentMembersResponse,
   SignupTrendsResponse,
+  TopCustomSubscriptionsResponse,
+  TopSubscriptionsResponse,
 } from './types';
 
 const BASE = '/dashboard';
@@ -17,4 +19,14 @@ export function getSignUpTrend() {
 
 export function getRecentMembers() {
   return api.get<RecentMembersResponse>(`${BASE}/recent-members`);
+}
+
+export function getTopSubscriptions() {
+  return api.get<TopSubscriptionsResponse>(`${BASE}/top-subscriptions`);
+}
+
+export function getTopCustomSubscriptions() {
+  return api.get<TopCustomSubscriptionsResponse>(
+    `${BASE}/top-custom-subscriptions`,
+  );
 }
