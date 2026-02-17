@@ -3,6 +3,7 @@ import type {
   DashboardStatsResponse,
   RecentMembersResponse,
   SignupTrendsResponse,
+  TodayEmailNotificationsResponse,
   TopCustomSubscriptionsResponse,
   TopSubscriptionsResponse,
 } from './types';
@@ -28,5 +29,11 @@ export function getTopSubscriptions() {
 export function getTopCustomSubscriptions() {
   return api.get<TopCustomSubscriptionsResponse>(
     `${BASE}/top-custom-subscriptions`,
+  );
+}
+
+export function getTodayEmailNotifications() {
+  return api.get<TodayEmailNotificationsResponse>(
+    `${BASE}/today-email-notifications`,
   );
 }
