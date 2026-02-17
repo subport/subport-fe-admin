@@ -137,6 +137,35 @@ export interface TodayEmailNotification {
   sentAt: string;
 }
 
+// 회원 목록
+export interface MembersResponse {
+  members: Member[];
+  currentPage: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface Member {
+  id: number;
+  email: string;
+  nickname: string;
+  memberSubscriptionCount: number;
+  customSubscriptionCount: number;
+  reminderDaysBefore: number;
+  lastLoginAt: string;
+  createdAt: string;
+  deleted: boolean;
+}
+
+export interface GetMembersParams {
+  page: number;
+  size: number;
+  sort?: string;
+  deleted?: boolean;
+  reminderEnabled?: boolean;
+  email?: string;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
