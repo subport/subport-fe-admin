@@ -207,9 +207,9 @@
         </div>
       </div>
 
-      <!-- 하단: 알림 발송 현황(좌) + 우측 스택 -->
+      <!-- 하단: 이메일 알림 발송 현황(좌) + 우측 스택 -->
       <div class="bottom-row">
-        <!-- 이메일 발송 현황 -->
+        <!-- 이메일 알림 발송 현황 -->
         <div class="info-card noti-card">
           <div class="info-card-header">
             <div class="card-title-wrap">
@@ -230,21 +230,21 @@
               </span>
               <span class="card-title-text">오늘 이메일 발송 현황</span>
             </div>
-            <router-link to="/notifications" class="see-all"
+            <router-link to="/email-notifications" class="see-all"
               >전체 보기 →</router-link
             >
           </div>
           <div class="noti-stat-row">
             <div class="noti-stat">
               <span class="noti-stat-num success">{{
-                notificationStats.sent
+                todayEmailNotifications.successCount
               }}</span>
               <span class="noti-stat-label">발송 완료</span>
             </div>
             <div class="noti-divider" />
             <div class="noti-stat">
               <span class="noti-stat-num pending">{{
-                notificationStats.scheduled
+                todayEmailNotifications.pendingCount
               }}</span>
               <span class="noti-stat-label">발송 예정</span>
             </div>
@@ -252,45 +252,30 @@
             <div class="noti-stat">
               <span
                 class="noti-stat-num"
-                :class="notificationStats.failed > 0 ? 'error' : 'zero'"
-                >{{ notificationStats.failed }}</span
-              >
+                :class="
+                  todayEmailNotifications.failedCount > 0 ? 'error' : 'zero'
+                "
+                >{{ todayEmailNotifications.failedCount }}
+              </span>
               <span class="noti-stat-label">실패</span>
             </div>
           </div>
-          <div v-if="notificationStats.failed > 0" class="fail-alert">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            <span>
-              발송 실패 {{ notificationStats.failed }}건 ·
-              <span class="retry-info"
-                >재시도 중 ({{ notificationStats.retryCount }}/3회)</span
-              >
-            </span>
-          </div>
           <div class="noti-list">
             <div
-              v-for="(noti, i) in recentNotifications"
+              v-for="(noti, i) in todayEmailNotifications.notifications"
               :key="i"
               class="noti-row"
             >
-              <span class="noti-status-dot" :class="noti.status" />
+              <span
+                class="noti-status-dot"
+                :class="noti.status.toLowerCase()"
+              />
               <div class="noti-info">
-                <span class="noti-email">{{ noti.email }}</span>
+                <span class="noti-email">{{ noti.recipientEmail }}</span>
                 <span class="noti-desc"
-                  >구독 서비스 {{ noti.serviceCount }}건 결제 {{ noti.dday }}일
-                  전 알림</span
-                >
+                  >구독 서비스 {{ noti.subscriptionCount }}건 결제,
+                  {{ noti.daysBeforePayment }}일 전 알림
+                </span>
               </div>
               <span class="noti-time">{{ formatNotiTime(noti.sentAt) }}</span>
             </div>
@@ -320,11 +305,11 @@
                 <span class="card-title-text">구독 서비스 등록 현황</span>
               </div>
             </div>
-            <div class="top-services-list">
+            <div class="top-subscriptions-list">
               <div
                 v-for="(svc, i) in topSubscriptions"
                 :key="i"
-                class="top-service-row"
+                class="top-subscription-row"
               >
                 <span class="rank-num">{{ i + 1 }}</span>
                 <div class="svc-logo-wrap">
@@ -457,6 +442,7 @@ import {
   getRecentMembers,
   getSignUpTrend,
   getStats,
+  getTodayEmailNotifications,
   getTopCustomSubscriptions,
   getTopSubscriptions,
 } from '@/api/dashboard';
@@ -464,15 +450,11 @@ import type {
   DashboardStatsResponse,
   RecentMember,
   SignupTrendsResponse,
+  TodayEmailNotificationsResponse,
   TopCustomSubscription,
   TopSubscription,
 } from '@/api/types';
-import type {
-  NotificationStats,
-  RecentNotification,
-  SignupBar,
-  StatCard,
-} from '@/types/dashboard';
+import type { SignupBar, StatCard } from '@/types/dashboard';
 import { computed, onMounted, ref } from 'vue';
 
 // ── 상태 ─────────────────────────────────────────
@@ -528,7 +510,7 @@ function buildStatCards(data: DashboardStatsResponse): StatCard[] {
       iconPaths: ['M2 3h20v14H2z', 'M8 21h8', 'M12 17v4'],
     },
     {
-      label: '활성 유저 (30일)',
+      label: '활성 유저 (최근 30일 이내 활동)',
       value: Number(data.currentActiveMemberCount),
       trend: 0,
       trendUnit: '',
@@ -558,50 +540,12 @@ function buildSignupBars(data: SignupTrendsResponse): SignupBar[] {
 
 const recentMembers = ref<RecentMember[]>([]);
 
-const notificationStats = ref<NotificationStats>({
-  sent: 142,
-  scheduled: 38,
-  failed: 2,
-  retryCount: 2,
+const todayEmailNotifications = ref<TodayEmailNotificationsResponse>({
+  notifications: [],
+  successCount: 0,
+  failedCount: 0,
+  pendingCount: 0,
 });
-
-const recentNotifications = ref<RecentNotification[]>([
-  {
-    email: 'minjun@email.com',
-    serviceCount: 3,
-    dday: 3,
-    status: 'sent',
-    sentAt: '2026-02-14T14:23:00',
-  },
-  {
-    email: 'seoyeon@email.com',
-    serviceCount: 1,
-    dday: 7,
-    status: 'sent',
-    sentAt: '2026-02-14T14:20:00',
-  },
-  {
-    email: 'jiho@email.com',
-    serviceCount: 2,
-    dday: 1,
-    status: 'failed',
-    sentAt: '2026-02-14T14:15:00',
-  },
-  {
-    email: 'sua@email.com',
-    serviceCount: 4,
-    dday: 3,
-    status: 'sent',
-    sentAt: '2026-02-14T13:58:00',
-  },
-  {
-    email: 'doyun@email.com',
-    serviceCount: 2,
-    dday: 7,
-    status: 'pending',
-    sentAt: null,
-  },
-]);
 
 const topSubscriptions = ref<TopSubscription[]>([]);
 const topCustomSubscriptions = ref<TopCustomSubscription[]>([]);
@@ -720,6 +664,15 @@ async function fetchRecentMembers(): Promise<void> {
   }
 }
 
+async function fetchTodayEmailNotifications(): Promise<void> {
+  try {
+    const { data } = await getTodayEmailNotifications();
+    todayEmailNotifications.value = data;
+  } catch (e) {
+    console.error('오늘 이메일 발송 현황 조회 실패', e);
+  }
+}
+
 async function fetchTopSubscriptions(): Promise<void> {
   try {
     const { data } = await getTopSubscriptions();
@@ -744,6 +697,7 @@ async function refreshData(): Promise<void> {
     fetchStats(),
     fetchSignupBars(),
     fetchRecentMembers(),
+    fetchTodayEmailNotifications(),
     fetchTopSubscriptions(),
     fetchTopCustomSubscriptions(),
   ]);
@@ -757,6 +711,7 @@ onMounted(async () => {
       fetchStats(),
       fetchSignupBars(),
       fetchRecentMembers(),
+      fetchTodayEmailNotifications(),
       fetchTopSubscriptions(),
       fetchTopCustomSubscriptions(),
     ]);
@@ -1255,7 +1210,7 @@ onMounted(async () => {
   margin-bottom: 16px;
 }
 
-/* ── 알림 발송 현황 ───────────────────────────────── */
+/* ── 이메일 알림 발송 현황 ───────────────────────────────── */
 .noti-stat-row {
   display: flex;
   align-items: center;
@@ -1297,19 +1252,6 @@ onMounted(async () => {
   font-size: 11px;
   color: var(--text-muted);
 }
-.fail-alert {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(250, 82, 82, 0.1);
-  color: #ff6b6b;
-  border: 1px solid rgba(250, 82, 82, 0.2);
-  border-radius: 8px;
-  padding: 9px 12px;
-  font-size: 12px;
-  margin-bottom: 12px;
-  font-weight: 500;
-}
 .noti-list {
   display: flex;
   flex-direction: column;
@@ -1318,7 +1260,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 0;
+  padding: 8px 10px;
   border-bottom: 1px solid var(--border);
 }
 .noti-row:last-child {
@@ -1362,17 +1304,14 @@ onMounted(async () => {
   color: var(--text-muted);
   white-space: nowrap;
 }
-.retry-info {
-  font-weight: 600;
-}
 
 /* ── 구독 서비스 등록 현황 ────────────────────────── */
-.top-services-list {
+.top-subscriptions-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-.top-service-row {
+.top-subscription-row {
   display: flex;
   align-items: center;
   gap: 10px;
