@@ -1,173 +1,266 @@
 <template>
-  <div class="page-title mb-4">
-    <h3>구독 서비스 상세</h3>
-  </div>
+  <div class="page">
+    <!-- 구독 서비스 정보 카드 -->
+    <div class="detail-card">
+      <!-- 읽기 모드 -->
+      <div v-if="!isEditingSubscription" class="view-mode">
+        <div class="service-info">
+          <!-- 로고 -->
+          <img
+            :src="subscription.logoImageUrl"
+            alt="logo"
+            class="service-logo"
+          />
 
-  <div class="container-fluid mt-4">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <!-- 읽기 모드 -->
-        <div v-if="!isEditingSubscription">
-          <!-- 구독 서비스 정보 -->
-          <div class="d-flex align-items-start">
-            <img
-              :src="subscription.logoImageUrl"
-              alt="logo"
-              class="rounded-3 me-3 flex-shrink-0"
-              width="80"
-              height="80"
-              style="object-fit: cover"
-            />
-
-            <div class="flex-grow-1">
-              <div class="row align-items-start">
-                <div class="col-12 col-lg">
-                  <h4 class="mb-4">{{ subscription.name }}</h4>
-                  <div class="d-flex align-items-center gap-3 flex-wrap">
-                    <span class="badge badge-color">{{
-                      subscription.type
-                    }}</span>
-                    <a
-                      v-if="subscription.planUrl"
-                      :href="subscription.planUrl"
-                      target="_blank"
-                      class="text-decoration-none d-inline-flex align-items-center small link-color"
-                    >
-                      <i class="bi bi-link-45deg me-1"></i>
-                      플랜 페이지
-                    </a>
-                  </div>
-                </div>
-
-                <!-- 날짜 정보 -->
-                <div class="col-auto text-end">
-                  <div class="small mb-1">
-                    <i class="bi bi-calendar-plus"></i>
-                    {{ subscription.createdAt }}
-                  </div>
-                  <div class="small">
-                    <i class="bi bi-calendar-check"></i>
-                    {{ subscription.lastModifiedAt }}
-                  </div>
-                </div>
-
-                <!-- 버튼 목록 -->
-                <div class="col-12 col-lg-auto mt-3 mt-lg-0">
-                  <div class="d-flex gap-2 justify-content-end">
-                    <button
-                      class="btn btn-outline-secondary btn-sm btn-list"
-                      @click="goSubscriptionList"
-                    >
-                      <i class="bi bi-list-ul"></i> 목록
-                    </button>
-                    <button
-                      class="btn btn-primary btn-sm btn-update"
-                      @click="startUpdateSubscription(subscription)"
-                    >
-                      <i class="bi bi-pencil"></i> 수정
-                    </button>
-                    <button
-                      class="btn btn-outline-danger btn-sm btn-delete"
-                      @click="handleDeleteSubscription"
-                    >
-                      <i class="bi bi-trash"></i> 삭제
-                    </button>
-                  </div>
-                </div>
-              </div>
+          <!-- 이름 + 메타 -->
+          <div class="service-meta">
+            <h2 class="service-name">{{ subscription.name }}</h2>
+            <div class="service-tags">
+              <span class="type-badge">{{ subscription.type }}</span>
+              <a
+                v-if="subscription.planUrl"
+                :href="subscription.planUrl"
+                target="_blank"
+                class="plan-link"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path
+                    d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                  />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+                플랜 페이지
+              </a>
             </div>
+            <div class="service-dates">
+              <span class="date-item">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                등록 {{ subscription.createdAt }}
+              </span>
+              <span class="date-item">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                  />
+                  <path
+                    d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                  />
+                </svg>
+                수정 {{ subscription.lastModifiedAt }}
+              </span>
+            </div>
+          </div>
+
+          <!-- 액션 버튼 -->
+          <div class="action-btns">
+            <button class="btn-list" @click="goSubscriptionList">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+                <line x1="3" y1="6" x2="3.01" y2="6" />
+                <line x1="3" y1="12" x2="3.01" y2="12" />
+                <line x1="3" y1="18" x2="3.01" y2="18" />
+              </svg>
+              목록
+            </button>
+            <button
+              class="btn-edit"
+              @click="startUpdateSubscription(subscription)"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                />
+                <path
+                  d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                />
+              </svg>
+              수정
+            </button>
+            <button class="btn-delete" @click="handleDeleteSubscription">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-1 14H6L5 6" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+                <path d="M9 6V4h6v2" />
+              </svg>
+              삭제
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 수정 모드 -->
+      <form v-else @submit.prevent="handleUpdateSubscription" class="edit-mode">
+        <div class="edit-header">
+          <div class="edit-title">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+              />
+              <path
+                d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+              />
+            </svg>
+            구독 서비스 수정
+          </div>
+          <div class="edit-actions">
+            <button type="submit" class="btn-save">
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              저장
+            </button>
+            <button
+              type="button"
+              class="btn-cancel"
+              @click="cancelUpdateSubscription"
+            >
+              취소
+            </button>
           </div>
         </div>
 
-        <!-- 수정 모드 -->
-        <form v-else @submit.prevent="handleUpdateSubscription">
-          <!-- 헤더 -->
-          <div
-            class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom"
-          >
-            <h5 class="mb-0">
-              <i class="bi bi-pencil-square"></i> 구독 서비스 수정
-            </h5>
-            <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-primary btn-sm btn-save">
-                <i class="bi bi-check-lg"></i> 저장
-              </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary btn-sm btn-cancel"
-                @click="cancelUpdateSubscription()"
-              >
-                <i class="bi bi-x-lg"></i> 취소
-              </button>
-            </div>
-          </div>
-
-          <div class="row g-3">
-            <!-- 이미지 업로드 -->
-            <div class="col-12 col-md-auto">
-              <label class="form-label"> 로고 이미지 </label>
-              <div class="d-flex flex-column align-items-stretch">
-                <!-- 이미지 미리보기 -->
-                <div
-                  class="position-relative d-inline-block"
-                  style="cursor: pointer"
-                  @click="logoInput?.click()"
+        <div class="edit-body">
+          <!-- 로고 업로드 -->
+          <div class="logo-edit-wrap">
+            <label class="form-label">로고 이미지</label>
+            <div class="logo-edit-box" @click="logoInput?.click()">
+              <img
+                :src="logoPreviewUrl || subscription.logoImageUrl"
+                alt="logo preview"
+                class="logo-edit-img"
+              />
+              <div class="logo-edit-overlay">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
                 >
-                  <img
-                    :src="logoPreviewUrl || subscription.logoImageUrl"
-                    alt="logo preview"
-                    class="rounded-3"
-                    width="120"
-                    height="120"
-                    style="object-fit: cover"
+                  <path
+                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
                   />
-                  <div class="hover-overlay">
-                    <i class="bi bi-camera text-white fs-3"></i>
-                  </div>
-                </div>
-
-                <!-- 파일 선택 -->
-                <input
-                  ref="logoInput"
-                  type="file"
-                  class="d-none"
-                  accept="image/*"
-                  @change="changeLogo"
-                />
-                <button
-                  type="button"
-                  class="btn btn-outline-primary btn-upload btn-sm w-100 mt-2"
-                  @click="logoInput?.click()"
-                >
-                  <i class="bi bi-upload"></i> 파일 선택
-                </button>
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
               </div>
             </div>
+            <button
+              type="button"
+              class="btn-upload"
+              @click="logoInput?.click()"
+            >
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              파일 선택
+            </button>
+            <input
+              ref="logoInput"
+              type="file"
+              class="hidden-input"
+              accept="image/*"
+              @change="changeLogo"
+            />
+          </div>
 
-            <!-- 폼 필드 -->
-            <div class="col-12 col-md">
-              <div class="row g-3">
-                <div class="col-12 col-sm-6">
-                  <label for="name" class="form-label">
-                    서비스명 <span class="text-danger">*</span>
-                  </label>
-                  <input
-                    id="name"
-                    v-model="subscriptionEditForm.name"
-                    type="text"
-                    class="form-control"
-                    required
-                  />
-                </div>
-
-                <div class="col-12 col-sm-6">
-                  <label for="type" class="form-label">
-                    타입 <span class="text-danger">*</span>
-                  </label>
+          <!-- 폼 필드 -->
+          <div class="edit-fields">
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label"
+                  >서비스명 <span class="required">*</span></label
+                >
+                <input
+                  v-model="subscriptionEditForm.name"
+                  type="text"
+                  class="form-input"
+                  required
+                />
+              </div>
+              <div class="form-field">
+                <label class="form-label"
+                  >타입 <span class="required">*</span></label
+                >
+                <div class="select-wrap">
                   <select
-                    id="type"
                     v-model="subscriptionEditForm.type"
-                    class="form-select"
+                    class="custom-select"
                     required
                   >
                     <option value="">선택</option>
@@ -180,90 +273,255 @@
                     </option>
                   </select>
                 </div>
-
-                <div class="col-12">
-                  <label for="planUrl" class="form-label"
-                    >플랜 페이지 URL</label
-                  >
-                  <input
-                    id="planUrl"
-                    v-model="subscriptionEditForm.planUrl"
-                    type="url"
-                    class="form-control"
-                    placeholder="https://example.com/pricing"
-                  />
-                </div>
               </div>
             </div>
+            <div class="form-field">
+              <label class="form-label">플랜 페이지 URL</label>
+              <input
+                v-model="subscriptionEditForm.planUrl"
+                type="url"
+                class="form-input"
+                placeholder="https://example.com/pricing"
+              />
+            </div>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
 
-    <div class="mt-4"></div>
-
-    <!-- 플랜 목록 영역 -->
-    <div class="card text-white shadow-sm">
-      <div
-        class="card-header border-bottom border-secondary d-flex justify-content-between align-items-center py-3"
-      >
-        <h4 class="mb-0">플랜 목록</h4>
-        <button class="btn btn-primary btn-sm btn-add" @click="startSavePlan">
-          <i class="bi bi-plus-circle"></i> 플랜 추가
+    <!-- 플랜 목록 카드 -->
+    <div class="plan-card">
+      <div class="plan-card-header">
+        <h3 class="plan-card-title">플랜 목록</h3>
+        <button class="btn-add-plan" @click="startSavePlan">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          플랜 추가
         </button>
       </div>
 
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-dark table-hover align-middle mb-0">
-            <thead>
-              <tr>
-                <th class="text-center">ID</th>
-                <th class="text-center">플랜명</th>
-                <th class="text-center">가격</th>
-                <th class="text-center">금액 단위</th>
-                <th class="text-center">기간</th>
-                <th class="text-center">등록일</th>
-                <th class="text-center">최근 수정일</th>
-                <th class="text-center">작업</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- 플랜 없음 -->
-              <tr v-if="plans.length === 0 && !isAddingPlan">
-                <td colspan="8" class="text-center py-5">
-                  <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
-                  등록된 플랜이 없습니다.
-                </td>
-              </tr>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="col-id">ID</th>
+              <th class="col-name">플랜명</th>
+              <th class="col-amount">가격</th>
+              <th class="col-unit">금액 단위</th>
+              <th class="col-duration">기간</th>
+              <th class="col-date">등록일</th>
+              <th class="col-date">최근 수정일</th>
+              <th class="col-action">작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 플랜 없음 -->
+            <tr v-if="plans.length === 0 && !isAddingPlan">
+              <td colspan="8" class="empty-cell">
+                <svg
+                  width="36"
+                  height="36"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+                <span>등록된 플랜이 없어요</span>
+              </td>
+            </tr>
 
-              <!-- 새 플랜 추가 행 -->
-              <tr v-if="isAddingPlan" class="table-active">
-                <td class="text-center">-</td>
-                <td>
+            <!-- 새 플랜 추가 행 -->
+            <tr v-if="isAddingPlan" class="editing-row">
+              <td class="col-id muted">-</td>
+              <td class="col-name">
+                <input
+                  v-model="planRegisterForm.name"
+                  type="text"
+                  class="inline-input"
+                  required
+                />
+              </td>
+              <td class="col-amount">
+                <input
+                  v-model="planRegisterForm.amount"
+                  type="text"
+                  inputmode="numeric"
+                  class="inline-input text-right"
+                  required
+                />
+              </td>
+              <td class="col-unit">
+                <select
+                  v-model="planRegisterForm.amountUnit"
+                  class="inline-select"
+                  required
+                >
+                  <option value="">선택</option>
+                  <option
+                    v-for="unit in AMOUNT_UNITS"
+                    :key="unit"
+                    :value="unit"
+                  >
+                    {{ unit }}
+                  </option>
+                </select>
+              </td>
+              <td class="col-duration">
+                <div class="duration-wrap">
                   <input
-                    v-model="planRegisterForm.name"
+                    v-model.number="planRegisterForm.durationMonths"
                     type="text"
-                    class="form-control form-control-sm"
+                    inputmode="numeric"
+                    class="inline-input text-center"
                     required
                   />
+                  <span class="unit-label">개월</span>
+                </div>
+              </td>
+              <td class="col-date muted">-</td>
+              <td class="col-date muted">-</td>
+              <td class="col-action col-action-editing">
+                <!-- 버튼이 행 위로 뜸 -->
+                <div class="floating-actions">
+                  <button type="button" class="btn-row-save" @click="savePlan">
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    저장
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-row-cancel"
+                    @click="cancelSavePlan"
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                    취소
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 기존 플랜 목록 -->
+            <tr
+              v-for="plan in plans"
+              :key="plan.id"
+              class="data-row"
+              :class="{ 'editing-row': editingPlanId === plan.id }"
+            >
+              <!-- 읽기 모드 -->
+              <template v-if="editingPlanId !== plan.id">
+                <td class="col-id muted">{{ plan.id }}</td>
+                <td class="col-name">{{ plan.name }}</td>
+                <td class="col-amount">{{ formatAmount(plan.amount) }}</td>
+                <td class="col-unit">
+                  <span class="unit-badge">{{ plan.amountUnit }}</span>
                 </td>
-                <td>
+                <td class="col-duration">{{ plan.durationMonths }}개월</td>
+                <td class="col-date">{{ plan.createdAt }}</td>
+                <td class="col-date">{{ plan.lastModifiedAt }}</td>
+                <td class="col-action">
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="btn-icon-edit"
+                      @click="startUpdatePlan(plan)"
+                    >
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <path
+                          d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                        />
+                        <path
+                          d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                        />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn-icon-delete"
+                      @click="handleDeletePlan(plan.id)"
+                    >
+                      <svg
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14H6L5 6" />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                        <path d="M9 6V4h6v2" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </template>
+
+              <!-- 수정 모드 -->
+              <template v-else>
+                <td class="col-id muted">{{ plan.id }}</td>
+                <td class="col-name">
                   <input
-                    v-model="planRegisterForm.amount"
-                    type="number"
-                    class="form-control form-control-sm text-end"
-                    min="0"
+                    v-model="planEditForm.name"
+                    type="text"
+                    class="inline-input"
                     required
                   />
                 </td>
-                <td>
+                <td class="col-amount">
+                  <input
+                    v-model="planEditForm.amount"
+                    type="text"
+                    inputmode="numeric"
+                    class="inline-input text-right"
+                    required
+                  />
+                </td>
+                <td class="col-unit">
                   <select
-                    v-model="planRegisterForm.amountUnit"
-                    class="form-select form-select-sm"
+                    v-model="planEditForm.amountUnit"
+                    class="inline-select"
                     required
                   >
-                    <option value="">선택</option>
                     <option
                       v-for="unit in AMOUNT_UNITS"
                       :key="unit"
@@ -273,159 +531,64 @@
                     </option>
                   </select>
                 </td>
-                <td>
-                  <div class="input-group input-group-sm">
+                <td class="col-duration">
+                  <div class="duration-wrap">
                     <input
-                      v-model.number="planRegisterForm.durationMonths"
-                      type="number"
-                      class="form-control text-center"
-                      min="1"
-                      placeholder="1"
+                      v-model.number="planEditForm.durationMonths"
+                      type="text"
+                      inputmode="numeric"
+                      class="inline-input text-center"
                       required
                     />
-                    <span class="input-group-text">개월</span>
+                    <span class="unit-label">개월</span>
                   </div>
                 </td>
-                <td class="text-center">-</td>
-                <td class="text-center">-</td>
-                <td class="text-center">
-                  <div class="btn-group btn-group-sm" role="group">
+                <td class="col-date">{{ plan.createdAt }}</td>
+                <td class="col-date">{{ plan.lastModifiedAt }}</td>
+                <td class="col-action col-action-editing">
+                  <!-- 버튼이 행 위로 뜸 -->
+                  <div class="floating-actions">
                     <button
                       type="button"
-                      class="btn btn-primary btn-save"
-                      @click="savePlan"
+                      class="btn-row-save"
+                      @click="handleUpdatePlan"
                     >
-                      <i class="bi bi-check-lg"></i> 저장
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                      저장
                     </button>
                     <button
                       type="button"
-                      class="btn btn-light btn-cancel"
-                      @click="cancelSavePlan"
+                      class="btn-row-cancel"
+                      @click="cancelUpdatePlan"
                     >
-                      <i class="bi bi-x-lg"></i> 취소
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                      취소
                     </button>
                   </div>
                 </td>
-              </tr>
-
-              <!-- 기존 플랜 목록 -->
-              <tr
-                v-for="plan in plans"
-                :key="plan.id"
-                :class="{ 'table-active': editingPlanId === plan.id }"
-              >
-                <!-- 읽기 모드 -->
-                <template v-if="editingPlanId !== plan.id">
-                  <td class="text-center">{{ plan.id }}</td>
-                  <td class="text-center">{{ plan.name }}</td>
-                  <td class="text-center">{{ formatAmount(plan.amount) }}</td>
-                  <td class="text-center">
-                    <span class="badge bg-secondary">{{
-                      plan.amountUnit
-                    }}</span>
-                  </td>
-                  <td class="text-center">{{ plan.durationMonths }}개월</td>
-                  <td class="text-center small">
-                    {{ plan.createdAt }}
-                  </td>
-                  <td class="text-center small">
-                    {{ plan.lastModifiedAt }}
-                  </td>
-                  <td class="text-center">
-                    <div class="btn-group btn-group-sm" role="group">
-                      <button
-                        type="button"
-                        class="btn btn-outline-primary btn-update"
-                        @click="startUpdatePlan(plan)"
-                      >
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-outline-danger btn-delete"
-                        @click="handleDeletePlan(plan.id)"
-                      >
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </template>
-
-                <!-- 수정 모드 -->
-                <template v-else>
-                  <td class="text-center">{{ plan.id }}</td>
-                  <td>
-                    <input
-                      v-model="planEditForm.name"
-                      type="text"
-                      class="form-control form-control-sm"
-                      required
-                    />
-                  </td>
-                  <td>
-                    <input
-                      v-model="planEditForm.amount"
-                      type="text"
-                      class="form-control form-control-sm text-end"
-                      required
-                    />
-                  </td>
-                  <td>
-                    <select
-                      v-model="planEditForm.amountUnit"
-                      class="form-select form-select-sm"
-                      required
-                    >
-                      <option
-                        v-for="unit in AMOUNT_UNITS"
-                        :key="unit"
-                        :value="unit"
-                      >
-                        {{ unit }}
-                      </option>
-                    </select>
-                  </td>
-                  <td>
-                    <div class="input-group input-group-sm">
-                      <input
-                        v-model.number="planEditForm.durationMonths"
-                        type="number"
-                        class="form-control text-center"
-                        min="1"
-                        required
-                      />
-                      <span class="input-group-text">개월</span>
-                    </div>
-                  </td>
-                  <td class="text-center small">
-                    {{ plan.createdAt }}
-                  </td>
-                  <td class="text-center small">
-                    {{ plan.lastModifiedAt }}
-                  </td>
-                  <td class="text-center">
-                    <div class="btn-group btn-group-sm" role="group">
-                      <button
-                        type="button"
-                        class="btn btn-primary btn-save"
-                        @click="handleUpdatePlan"
-                      >
-                        <i class="bi bi-check-lg"></i> 저장
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-light btn-sm btn-cancel"
-                        @click="cancelUpdatePlan"
-                      >
-                        <i class="bi bi-x-lg"></i> 취소
-                      </button>
-                    </div>
-                  </td>
-                </template>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+              </template>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -439,14 +602,14 @@ import {
   updateSubscription,
 } from '@/api/subscriptions';
 import {
+  AMOUNT_UNITS,
+  SUBSCRIPTION_TYPES,
   type Plan,
   type PlanForm,
   type RegisterPlanRequest,
   type Subscription,
   type UpdatePlanRequest,
   type UpdateSubscriptionRequest,
-  AMOUNT_UNITS,
-  SUBSCRIPTION_TYPES,
 } from '@/api/types';
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -454,7 +617,7 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 
-// Reactive 상태 (구독)
+// ── 구독 상태 ─────────────────────────────────────
 const subscriptionId = Number(route.params.id);
 const subscription = ref<Subscription>({
   id: 0,
@@ -476,7 +639,7 @@ const selectedLogoFile = ref<File | null>(null);
 const logoPreviewUrl = ref<string | null>(null);
 const logoInput = ref<HTMLInputElement | null>(null);
 
-// Reactive 상태 (플랜)
+// ── 플랜 상태 ─────────────────────────────────────
 const plans = ref<Plan[]>([]);
 const planRegisterForm = ref<PlanForm>({
   name: '',
@@ -493,14 +656,7 @@ const planEditForm = ref<PlanForm>({
 const isAddingPlan = ref(false);
 const editingPlanId = ref<number | null>(null);
 
-/**
- * 구독 관련 함수
- * 1. 구독 조회
- * 2. 구독 수정
- * 3. 구독 삭제
- */
-
-// 1.
+// ── 구독 조회 ─────────────────────────────────────
 const fetchSubscription = async () => {
   try {
     const response = await getSubscription(subscriptionId);
@@ -511,20 +667,19 @@ const fetchSubscription = async () => {
   }
 };
 
-// 2.
-const startUpdateSubscription = (subscription: Subscription) => {
+// ── 구독 수정 ─────────────────────────────────────
+const startUpdateSubscription = (sub: Subscription) => {
   isEditingSubscription.value = true;
   subscriptionEditForm.value = {
-    name: subscription.name,
-    type: subscription.type,
-    planUrl: subscription.planUrl || '',
-    logoImageUrl: subscription.logoImageUrl,
+    name: sub.name,
+    type: sub.type,
+    planUrl: sub.planUrl || '',
+    logoImageUrl: sub.logoImageUrl,
   };
 };
 const changeLogo = (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0] || null;
   selectedLogoFile.value = file;
-
   if (file) {
     const reader = new FileReader();
     reader.onload = e => {
@@ -532,7 +687,7 @@ const changeLogo = (event: Event) => {
     };
     reader.readAsDataURL(file);
   } else {
-    logoPreviewUrl.value = null; // 취소 시 기존 이미지로 복구
+    logoPreviewUrl.value = null;
   }
 };
 const handleUpdateSubscription = async () => {
@@ -540,7 +695,6 @@ const handleUpdateSubscription = async () => {
     alert('이름은 최대 10자까지 가능합니다');
     return;
   }
-
   try {
     const formData: UpdateSubscriptionRequest = {
       name: subscriptionEditForm.value.name,
@@ -563,16 +717,14 @@ const cancelUpdateSubscription = () => {
   logoPreviewUrl.value = null;
 };
 
-// 3.
+// ── 구독 삭제 ─────────────────────────────────────
 const handleDeleteSubscription = async () => {
   if (
     !confirm(
       '정말 이 구독 서비스를 삭제하시겠습니까?\n관련된 모든 플랜도 함께 삭제됩니다.',
     )
-  ) {
+  )
     return;
-  }
-
   try {
     await deleteSubscription(subscriptionId);
     alert('삭제되었습니다.');
@@ -583,15 +735,7 @@ const handleDeleteSubscription = async () => {
   }
 };
 
-/**
- * 플랜 관련 함수
- * 1. 플랜 목록 조회
- * 2. 플랜 생성
- * 3. 플랜 수정
- * 4. 플랜 삭제
- */
-
-// 1.
+// ── 플랜 조회 ─────────────────────────────────────
 const fetchPlans = async () => {
   try {
     const response = await getPlans(subscriptionId);
@@ -602,7 +746,7 @@ const fetchPlans = async () => {
   }
 };
 
-// 2.
+// ── 플랜 추가 ─────────────────────────────────────
 const startSavePlan = () => {
   isAddingPlan.value = true;
   editingPlanId.value = null;
@@ -614,12 +758,11 @@ const startSavePlan = () => {
   };
 };
 const savePlan = async () => {
-  const errorMessage = validatePlanForm(planRegisterForm.value);
-  if (errorMessage) {
-    alert(errorMessage);
+  const err = validatePlanForm(planRegisterForm.value);
+  if (err) {
+    alert(err);
     return;
   }
-
   try {
     const data: RegisterPlanRequest = {
       name: planRegisterForm.value.name,
@@ -646,7 +789,7 @@ const cancelSavePlan = () => {
   };
 };
 
-// 3.
+// ── 플랜 수정 ─────────────────────────────────────
 const startUpdatePlan = (plan: Plan) => {
   isAddingPlan.value = false;
   editingPlanId.value = plan.id;
@@ -659,13 +802,11 @@ const startUpdatePlan = (plan: Plan) => {
 };
 const handleUpdatePlan = async () => {
   if (!editingPlanId.value) return;
-
-  const errorMessage = validatePlanForm(planEditForm.value);
-  if (errorMessage) {
-    alert(errorMessage);
+  const err = validatePlanForm(planEditForm.value);
+  if (err) {
+    alert(err);
     return;
   }
-
   try {
     const data: UpdatePlanRequest = {
       name: planEditForm.value.name,
@@ -692,12 +833,9 @@ const cancelUpdatePlan = () => {
   };
 };
 
-// 4.
+// ── 플랜 삭제 ─────────────────────────────────────
 const handleDeletePlan = async (planId: number) => {
-  if (!confirm('정말 삭제하시겠습니까?')) {
-    return;
-  }
-
+  if (!confirm('정말 삭제하시겠습니까?')) return;
   try {
     await deletePlan(planId);
     alert('플랜이 삭제되었습니다.');
@@ -708,38 +846,22 @@ const handleDeletePlan = async (planId: number) => {
   }
 };
 
-/**
- * 기타
- */
-
-const validatePlanForm = (form: PlanForm) => {
-  const name = form.name;
-  const amount = form.amount;
-  const amountUnit = form.amountUnit;
-  const durationMonths = form.durationMonths;
-
-  if (!name || !amount == null || !amountUnit || !durationMonths == null) {
+// ── 유틸 ──────────────────────────────────────────
+const validatePlanForm = (form: PlanForm): string | null => {
+  if (
+    !form.name ||
+    form.amount == null ||
+    !form.amountUnit ||
+    form.durationMonths == null
+  )
     return '모든 값을 입력해주세요';
-  }
-  if (name.length > 10) {
-    return '이름은 최대 10자까지 가능합니다';
-  }
-  if (amount < 0) {
-    return '가격은 0원 이상이어야 합니다';
-  }
-  if (durationMonths < 1) {
-    return '기간은 1개월 이상이어야 합니다';
-  }
+  if (form.name.length > 10) return '이름은 최대 10자까지 가능합니다';
+  if (form.amount < 0) return '가격은 0원 이상이어야 합니다';
+  if (form.durationMonths < 1) return '기간은 1개월 이상이어야 합니다';
   return null;
 };
-
-const formatAmount = (amount: number) => {
-  return amount.toLocaleString();
-};
-
-const goSubscriptionList = () => {
-  router.push('/subscriptions');
-};
+const formatAmount = (amount: number) => amount.toLocaleString();
+const goSubscriptionList = () => router.push('/subscriptions');
 
 onMounted(() => {
   fetchSubscription();
@@ -748,140 +870,652 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-title h3 {
-  color: #fff;
+.page {
+  /* ── CSS 변수 ── */
+  --bg-base: #1a1c22;
+  --bg-surface: #22252e;
+  --bg-raised: #2a2d38;
+  --bg-hover: #30333f;
+  --mint: #6fcfc3;
+  --mint-dim: #4ab5a8;
+  --mint-glow: rgba(111, 207, 195, 0.12);
+  --text-primary: #f0f2f5;
+  --text-secondary: #9aa0b0;
+  --text-muted: #5c6278;
+  --border: #2e3140;
+  --border-mid: #383c50;
+
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+  background: var(--bg-base);
+  min-height: 100vh;
+  padding: 28px 32px 48px;
+  color: var(--text-primary);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.card {
-  background-color: #313137;
-  color: #ffffff;
+/* ── 공통 카드 ───────────────────────────────────── */
+.detail-card,
+.plan-card {
+  background: var(--bg-surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
 }
 
-.hover-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
+/* ── 구독 서비스 정보 (읽기 모드) ─────────────────── */
+.view-mode {
+  padding: 24px;
+}
+.service-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+.service-logo {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border-mid);
+}
+.service-meta {
+  flex: 1;
+}
+.service-name {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 10px;
+  letter-spacing: -0.3px;
+}
+.service-tags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.type-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mint);
+  background: var(--mint-glow);
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(111, 207, 195, 0.2);
+  white-space: nowrap;
+}
+.plan-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--mint);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.plan-link:hover {
+  color: var(--mint-dim);
+  text-decoration: underline;
+}
+.service-dates {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.date-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* 액션 버튼 */
+.action-btns {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+.btn-list,
+.btn-edit,
+.btn-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+  border: 1px solid;
+}
+.btn-list {
+  background: var(--bg-raised);
+  border-color: var(--border-mid);
+  color: var(--text-secondary);
+}
+.btn-list:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.btn-edit {
+  background: var(--mint);
+  border-color: var(--mint);
+  color: #0f1115;
+  font-weight: 700;
+}
+.btn-edit:hover {
+  background: var(--mint-dim);
+  border-color: var(--mint-dim);
+}
+.btn-delete {
+  background: transparent;
+  border-color: rgba(250, 82, 82, 0.4);
+  color: #ff6b6b;
+}
+.btn-delete:hover {
+  background: rgba(250, 82, 82, 0.1);
+  border-color: #fa5252;
+}
+
+/* ── 수정 모드 ───────────────────────────────────── */
+.edit-mode {
+  padding: 0;
+}
+.edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+}
+.edit-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--mint);
+}
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn-cancel {
+  padding: 7px 16px;
+  border-radius: 8px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-mid);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.btn-cancel:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+.btn-save {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 18px;
+  border-radius: 8px;
+  background: var(--mint);
+  border: none;
+  color: #0f1115;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.15s;
+}
+.btn-save:hover {
+  background: var(--mint-dim);
+}
+
+.edit-body {
+  display: flex;
+  gap: 28px;
+  padding: 24px;
+  flex-wrap: wrap;
+}
+
+/* 로고 수정 */
+.logo-edit-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100px;
+}
+.logo-edit-box {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid var(--border-mid);
+}
+.logo-edit-img {
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* 반투명 검정 */
+  object-fit: cover;
+  display: block;
+}
+.logo-edit-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.5rem; /* 이미지 둥글기와 맞춤 */
-  opacity: 0; /* 기본 숨김 */
+  opacity: 0;
   transition: opacity 0.2s;
+  color: #fff;
 }
-
-.position-relative:hover .hover-overlay {
-  opacity: 1; /* 마우스 올리면 보이게 */
+.logo-edit-box:hover .logo-edit-overlay {
+  opacity: 1;
 }
-
-.table {
-  --bs-table-bg: #313137;
-  --bs-table-color: #ffffff;
-  table-layout: fixed;
+.btn-upload {
+  /* 이미지 너비(100px)에 맞춰 꽉 채움 */
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px 0;
+  border-radius: 7px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-mid);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  box-sizing: border-box;
+}
+.btn-upload:hover {
+  border-color: var(--mint);
+  color: var(--mint);
+  background: var(--mint-glow);
+}
+.hidden-input {
+  display: none;
 }
 
-.btn {
+/* 폼 필드 */
+.edit-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 280px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.required {
+  color: #ff6b6b;
+}
+.form-input {
+  padding: 8px 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-mid);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--mint);
+}
+.form-input::placeholder {
+  color: var(--text-muted);
+}
+.select-wrap {
+  position: relative;
+}
+.custom-select {
+  appearance: none;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-mid);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.custom-select:focus {
+  outline: none;
+  border-color: var(--mint);
+}
+.custom-select option {
+  background: var(--bg-raised);
+}
+
+/* ── 플랜 카드 ───────────────────────────────────── */
+.plan-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.plan-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+.btn-add-plan {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  background: var(--mint);
+  border: none;
+  color: #0f1115;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.15s;
+}
+.btn-add-plan:hover {
+  background: var(--mint-dim);
+}
+
+/* ── 테이블 ──────────────────────────────────────── */
+.table-wrap {
+  overflow: visible;
+} /* floating-actions가 테이블 밖으로 나올 수 있게 */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.data-table thead tr {
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border-mid);
+}
+.data-table th {
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.4px;
+  text-align: center;
+}
+.data-row {
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.15s;
+}
+.data-row:last-child {
+  border-bottom: none;
+}
+.data-row:hover {
+  background: var(--bg-hover);
+}
+.editing-row {
+  background: var(--bg-raised) !important;
+}
+.data-table td {
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text-primary);
+  text-align: center;
+  vertical-align: middle;
+}
+.muted {
+  color: var(--text-muted) !important;
+  font-size: 12px !important;
+}
+
+/* 컬럼 너비 */
+.col-id {
+  width: 56px;
+}
+.col-name {
+  width: auto;
+}
+.col-amount {
+  width: 100px;
+}
+.col-unit {
+  width: 90px;
+}
+.col-duration {
+  width: 90px;
+}
+.col-date {
+  width: 110px;
+  font-size: 12px !important;
+  color: var(--text-secondary) !important;
+}
+.col-action {
+  width: 90px;
+}
+
+/* 수정 모드일 때 작업 컬럼: 저장/취소 버튼 2개가 들어갈 너비로 확장 */
+.col-action-editing {
+  width: 130px;
+  min-width: 130px;
+}
+
+/* 저장/취소 버튼 세트 (인라인, 같은 행 안에 배치) */
+.floating-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   white-space: nowrap;
 }
 
-.btn-add {
-  background-color: #b2b4b6;
-  border-color: #b2b4b6;
-  color: #000;
+/* 배지 */
+.unit-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-raised);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border-mid);
 }
 
-.btn-add:hover {
-  background-color: #9da0a3;
-  border-color: #9da0a3;
+/* 인라인 수정 인풋 — 숫자 스피너(화살표) 제거, 기본 가운데 정렬 */
+.inline-input {
+  width: 100%;
+  padding: 5px 8px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-mid);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: inherit;
+  box-sizing: border-box;
+  text-align: center;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.inline-input::-webkit-outer-spin-button,
+.inline-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.inline-input:focus {
+  outline: none;
+  border-color: var(--mint);
+}
+.inline-input.text-right {
+  text-align: right;
+}
+.inline-select {
+  width: 100%;
+  padding: 5px 8px;
+  appearance: none;
+  background: var(--bg-base);
+  border: 1px solid var(--border-mid);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+}
+.inline-select:focus {
+  outline: none;
+  border-color: var(--mint);
+}
+.inline-select option {
+  background: var(--bg-raised);
 }
 
-.btn-update,
-.btn-save {
-  background-color: #6fcfc3;
-  border-color: #6fcfc3;
-  color: #000;
-}
-
-.btn-update:hover,
-.btn-save:hover {
-  background-color: #5bb8ad;
-  border-color: #5bb8ad;
-}
-
-.btn-cancel {
-  background-color: #6c757d;
-  border-color: #6c757d;
-  color: #fff;
-}
-
-.btn-cancel:hover {
-  background-color: #5a6268;
-  border-color: #5a6268;
-}
-
-.btn-delete {
-  background-color: transparent;
-  border: 1px solid #6fcfc3;
-  color: #6fcfc3;
-}
-
-.btn-delete:hover {
-  background-color: rgba(111, 207, 195, 0.15);
-}
-
-.btn-list {
-  background-color: transparent;
-  border: 1px solid #adb5bd;
-  color: #adb5bd;
-}
-
-.btn-list:hover {
-  background-color: #adb5bd;
-  color: #212529;
-}
-
-.badge-color {
-  background-color: rgba(111, 207, 195, 0.2);
-  color: #6fcfc3;
-  border: 1px solid rgba(111, 207, 195, 0.4);
-  font-weight: 500;
-}
-
-.link-color {
-  color: #6fcfc3;
-  text-decoration: none;
-  font-weight: 500;
-  display: inline-flex;
+.duration-wrap {
+  display: flex;
   align-items: center;
+  gap: 6px;
+}
+.unit-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
-.link-color:hover {
-  color: #5bb8ad;
-  text-decoration: underline;
+/* 저장/취소 버튼 (액션 바 안) */
+.btn-row-save,
+.btn-row-cancel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-row-save {
+  background: var(--mint);
+  border: none;
+  color: #0f1115;
+}
+.btn-row-save:hover {
+  background: var(--mint-dim);
+}
+.btn-row-cancel {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-mid);
+  color: var(--text-secondary);
+}
+.btn-row-cancel:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
 }
 
-.btn-upload {
-  background-color: #6fcfc3;
-  border: 1px solid #6fcfc3;
-  color: #000;
-  font-weight: 500;
-  transition:
-    background-color 0.2s,
-    border-color 0.2s;
+/* 아이콘 버튼 (수정/삭제) */
+.btn-icon-edit,
+.btn-icon-delete {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid;
+}
+.btn-icon-edit {
+  background: var(--bg-raised);
+  border-color: var(--border-mid);
+  color: var(--text-secondary);
+}
+.btn-icon-edit:hover {
+  border-color: var(--mint);
+  color: var(--mint);
+  background: var(--mint-glow);
+}
+.btn-icon-delete {
+  background: transparent;
+  border-color: rgba(250, 82, 82, 0.3);
+  color: rgba(250, 82, 82, 0.6);
+}
+.btn-icon-delete:hover {
+  border-color: #fa5252;
+  color: #ff6b6b;
+  background: rgba(250, 82, 82, 0.1);
+}
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.btn-upload:hover {
-  background-color: #5bb8ad;
-  border-color: #5bb8ad;
-  color: #000;
+/* 빈 상태 */
+.empty-cell {
+  text-align: center !important;
+  padding: 48px 0 !important;
+  color: var(--text-muted);
+}
+.empty-cell svg {
+  opacity: 0.3;
+  margin-bottom: 10px;
+  display: block;
+  margin-inline: auto;
+}
+.empty-cell span {
+  font-size: 14px;
+  display: block;
 }
 
-.form-select:focus,
-.form-control:focus {
-  border-color: #5bb8ad;
-  box-shadow: 0 0 0 3px rgba(111, 207, 195, 0.15);
+/* ── 반응형 ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .page {
+    padding: 16px;
+  }
+  .service-info {
+    flex-direction: column;
+  }
+  .action-btns {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .col-date {
+    display: none;
+  }
 }
 </style>

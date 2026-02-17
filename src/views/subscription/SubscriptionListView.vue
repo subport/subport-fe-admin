@@ -576,7 +576,7 @@ onMounted(() => {
 }
 .page-sub {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 .btn-add {
   display: flex;
