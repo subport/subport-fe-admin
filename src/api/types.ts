@@ -166,6 +166,41 @@ export interface GetMembersParams {
   email?: string;
 }
 
+// 이메일 발송 목록
+export interface EmailNotificationsResponse {
+  notifications: EmailNotification[];
+  currentPage: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface EmailNotification {
+  email: string;
+  paymentDate: string; // LocalDate
+  daysBeforePayment: number; // 1 or 3만 존재
+  status: string; // PENDING, FAILED, SENT
+  retryCount: number; // status가 FAILED일 때만 표기, 총 시도 횟수는 3회 고정
+  sentAt: string; // LocalDateTime
+  subscriptions: SubscriptionInEmailNotification[];
+}
+
+export interface SubscriptionInEmailNotification {
+  logoImageUrl: string;
+  name: string;
+  amount: string; // "#,###" 형태로 넘어온 상태
+  amountUnit: string; // 그대로 사용
+}
+
+export interface GetEmailNotificationsParams {
+  page: number;
+  size: number; // 지금은 15 고정
+  sort?: string;
+  date?: string;
+  status?: string;
+  daysBeforePayment?: number;
+  email?: string;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
