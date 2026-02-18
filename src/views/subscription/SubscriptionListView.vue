@@ -4,7 +4,7 @@
     <div class="page-header">
       <div class="header-left">
         <h1 class="page-title">구독 서비스 관리</h1>
-        <span class="page-sub">제공 중인 구독 서비스를 관리해요</span>
+        <span class="page-sub">제공 중인 구독 서비스 정보를 관리해요</span>
       </div>
       <button class="btn-add" @click="startSaveSubscription">
         <svg
@@ -94,6 +94,19 @@
             placeholder="이름으로 검색"
             @keyup.enter="handleSearch"
           />
+          <button v-if="searchedName" class="search-clear" @click="clearSearch">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
           <button class="search-btn" @click="handleSearch">검색</button>
         </div>
       </div>
@@ -139,7 +152,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="subscriptions.length === 0">
+          <tr v-if="!isLoading && subscriptions.length === 0">
             <td colspan="8" class="empty-cell">
               <svg
                 width="36"
@@ -440,6 +453,7 @@ const selectedLogoFile = ref<File | null>(null);
 const logoPreviewUrl = ref<string | null>(null);
 const logoInput = ref<HTMLInputElement | null>(null);
 const isAddingSubscription = ref(false);
+const isLoading = ref(false);
 
 const SORT_MAP: Record<string, string> = {
   '': 'id,asc',
@@ -463,22 +477,29 @@ const currentPage = ref(1);
 const totalElements = ref(0);
 const totalPages = ref(0);
 
-const fetchSubscriptions = async () => {
-  const params: GetSubscriptionsParams = {
-    page: currentPage.value - 1,
-    size: 10,
-  };
-  if (selectedType.value) params.type = selectedType.value;
-  if (sort.value) params.sort = SORT_MAP[sort.value];
-  if (appliedName.value) params.name = appliedName.value;
+const fetchSubscriptions = async (isInitial = false) => {
+  if (isInitial) isLoading.value = true;
+  try {
+    const params: GetSubscriptionsParams = {
+      page: currentPage.value - 1,
+      size: 10,
+    };
+    if (selectedType.value) params.type = selectedType.value;
+    if (sort.value) params.sort = SORT_MAP[sort.value];
+    if (appliedName.value) params.name = appliedName.value;
 
-  const response = await getSubscriptions(params);
-  const data = response.data as SubscriptionsResponse;
+    const response = await getSubscriptions(params);
+    const data = response.data as SubscriptionsResponse;
 
-  subscriptions.value = data.subscriptions;
-  currentPage.value = data.currentPage;
-  totalElements.value = data.totalElements;
-  totalPages.value = data.totalPages;
+    subscriptions.value = data.subscriptions;
+    currentPage.value = data.currentPage;
+    totalElements.value = data.totalElements;
+    totalPages.value = data.totalPages;
+  } catch (e) {
+    console.error('구독 서비스 목록 조회 실패', e);
+  } finally {
+    if (isInitial) isLoading.value = false;
+  }
 };
 
 const startSaveSubscription = () => {
@@ -558,6 +579,19 @@ const onSortChange = (value: string) => {
   });
 };
 
+const clearSearch = () => {
+  searchedName.value = '';
+  appliedName.value = '';
+  currentPage.value = 1;
+  router.replace({
+    query: {
+      ...(currentPage.value > 1 ? { page: String(currentPage.value) } : {}),
+      type: selectedType.value || undefined,
+      sort: sort.value || undefined,
+    },
+  });
+};
+
 const resetFilters = () => {
   selectedType.value = '';
   sort.value = '';
@@ -611,7 +645,7 @@ watch(
 );
 
 onMounted(() => {
-  fetchSubscriptions();
+  fetchSubscriptions(true);
 });
 
 // ── 페이지 번호 계산 ──────────────────────────────
@@ -820,6 +854,19 @@ const pageNumbers = computed<(number | string)[]>(() => {
 .search-input:focus {
   outline: none;
   border-color: var(--mint);
+}
+.search-clear {
+  position: absolute;
+  right: 70px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  padding: 2px;
+}
+.search-clear:hover {
+  color: var(--text-primary);
 }
 .search-btn {
   position: absolute;
