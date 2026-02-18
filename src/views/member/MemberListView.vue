@@ -4,7 +4,7 @@
     <div class="page-header">
       <div class="header-left">
         <h1 class="page-title">회원 관리</h1>
-        <span class="page-sub">서비스에 가입된 회원 정보를 관리해요</span>
+        <span class="page-sub">서비스에 가입한 회원 정보를 관리해요</span>
       </div>
     </div>
 
@@ -78,7 +78,7 @@
             v-model="emailInput"
             type="text"
             class="search-input"
-            placeholder="이메일 주소 검색"
+            placeholder="이메일로 검색"
             @keydown.enter="onEmailSearch"
           />
           <button v-if="emailInput" class="search-clear" @click="onEmailClear">
@@ -125,25 +125,7 @@
 
     <!-- 테이블 -->
     <div class="table-wrap">
-      <div v-if="isLoading" class="table-loading">
-        <svg
-          class="loading-spinner"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.5"
-        >
-          <polyline points="23 4 23 10 17 10" />
-          <polyline points="1 20 1 14 7 14" />
-          <path
-            d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
-          />
-        </svg>
-      </div>
-
-      <table v-else class="data-table">
+      <table class="data-table">
         <thead>
           <tr>
             <th class="col-id">ID</th>
@@ -158,7 +140,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-if="members.length === 0">
+          <tr v-if="!isLoading && members.length === 0">
             <td colspan="9" class="empty-cell">
               <svg
                 width="36"
@@ -360,8 +342,8 @@ const reminderTabs = [
 ] as const;
 
 // ── API 호출 ─────────────────────────────────────
-async function fetchMembers() {
-  isLoading.value = true;
+async function fetchMembers(isInitial = false) {
+  if (isInitial) isLoading.value = true;
   try {
     const { data } = await getMembers({
       page: currentPage.value - 1,
@@ -377,7 +359,7 @@ async function fetchMembers() {
   } catch (e) {
     console.error('회원 목록 조회 실패', e);
   } finally {
-    isLoading.value = false;
+    if (isInitial) isLoading.value = false;
   }
 }
 
@@ -464,7 +446,7 @@ function initFromQuery() {
 // ── 초기화 ─────────────────────────────────────
 onMounted(() => {
   initFromQuery();
-  fetchMembers();
+  fetchMembers(true); // 초기 로딩
 });
 
 // ── 필터/정렬/페이지 변경 감지 → 재조회 ─────────
@@ -674,7 +656,7 @@ function formatDate(isoString: string): string {
 }
 .search-clear {
   position: absolute;
-  right: 8px;
+  right: 70px;
   background: none;
   border: none;
   cursor: pointer;
@@ -751,7 +733,7 @@ function formatDate(isoString: string): string {
   border: 1px solid var(--border);
   overflow: hidden;
   margin-bottom: 20px;
-  min-height: 200px;
+  min-height: auto;
   display: flex;
   flex-direction: column;
 }
