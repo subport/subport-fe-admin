@@ -10,20 +10,11 @@
 
       <!-- 로고 -->
       <div class="card-logo">
-        <div class="logo-icon">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-          >
-            <rect x="2" y="3" width="20" height="14" rx="2" />
-            <line x1="8" y1="21" x2="16" y2="21" />
-            <line x1="12" y1="17" x2="12" y2="21" />
-          </svg>
-        </div>
+        <img
+          src="https://objectstorage.ap-chuncheon-1.oraclecloud.com/n/axnklumwzgke/b/subpport-bucket/o/subport_logo_no_background.png"
+          alt="subport"
+          class="logo-img"
+        />
         <span class="logo-text">subport</span>
       </div>
 
@@ -254,19 +245,13 @@ watch(
 .card-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0;
   padding: 28px 32px 0;
 }
-.logo-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(111, 207, 195, 0.15);
-  border: 1px solid rgba(111, 207, 195, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6fcfc3;
+.logo-img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
 }
 .logo-text {
   font-size: 18px;
