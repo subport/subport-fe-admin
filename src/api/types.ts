@@ -211,6 +211,18 @@ export interface TokenResponse {
   accessToken: string;
 }
 
+// 어드민 계정
+export interface UpdatePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface ProfileResponse {
+  nickname: string;
+  email: string;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
