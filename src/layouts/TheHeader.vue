@@ -18,13 +18,7 @@
     <div class="header-right">
       <div class="profile-wrap" ref="profileRef">
         <button class="profile-btn" @click="toggleDropdown">
-          <div class="admin-avatar">
-            {{ adminInitial }}
-          </div>
-          <div class="admin-info">
-            <span class="admin-name">{{ adminName }}</span>
-            <span class="admin-role">관리자</span>
-          </div>
+          <span class="admin-name">관리자 프로필</span>
           <svg
             class="chevron"
             :class="{ rotated: dropdownOpen }"
@@ -183,12 +177,33 @@
 </template>
 
 <script setup lang="ts">
+import { getProfile, updatePassword } from '@/api/account';
+import { logout as logoutApi } from '@/api/auth';
+import type { ProfileResponse } from '@/api/types';
+import { useAuthStore } from '@/stores/auth';
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 
-// ── 관리자 정보 (API 연동 시 교체) ───────────────────
-const adminName = ref('관리자');
-const adminEmail = ref('admin@subport.com');
+const authStore = useAuthStore();
+
+// ── 관리자 정보 ──────────────────────────────────────
+const profile = ref<ProfileResponse | null>(null);
+const adminName = computed(() => profile.value?.nickname ?? '관리자');
+const adminEmail = computed(() => profile.value?.email ?? '');
 const adminInitial = computed(() => adminName.value.charAt(0));
+
+// 프로필 조회
+async function fetchProfile() {
+  try {
+    const { data } = await getProfile();
+    profile.value = data;
+  } catch (e) {
+    console.error('프로필 조회 실패:', e);
+  }
+}
+
+onMounted(() => {
+  fetchProfile();
+});
 
 // ── 드롭다운 ──────────────────────────────────────────
 const dropdownOpen = ref(false);
@@ -208,10 +223,15 @@ onBeforeUnmount(() =>
   document.removeEventListener('click', handleOutsideClick),
 );
 
-function handleLogout() {
+async function handleLogout() {
   dropdownOpen.value = false;
-  // TODO: 로그아웃 API 호출 후 로그인 페이지로 이동
-  alert('로그아웃');
+  try {
+    await logoutApi();
+  } catch (e) {
+    console.error('로그아웃 API 실패:', e);
+  }
+  // 로컬 토큰 삭제 및 로그인 페이지 이동
+  authStore.logout();
 }
 
 // ── 비밀번호 변경 모달 ────────────────────────────────
@@ -242,11 +262,15 @@ function closePasswordModal() {
 async function handlePasswordChange() {
   if (!canSubmit.value) return;
   try {
-    // TODO: API 호출
-    // await changePassword({ current: passwordForm.current, next: passwordForm.next });
+    await updatePassword({
+      oldPassword: passwordForm.current,
+      newPassword: passwordForm.next,
+      confirmPassword: passwordForm.confirm,
+    });
     alert('비밀번호가 변경되었습니다.');
     closePasswordModal();
-  } catch {
+  } catch (e) {
+    console.error('비밀번호 변경 실패:', e);
     alert('비밀번호 변경에 실패했습니다.');
   }
 }
@@ -349,21 +373,10 @@ async function handlePasswordChange() {
   font-weight: 800;
   flex-shrink: 0;
 }
-.admin-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1px;
-}
 .admin-name {
   font-size: 13px;
   font-weight: 600;
   color: #f0f2f5;
-  line-height: 1.2;
-}
-.admin-role {
-  font-size: 10px;
-  color: #5c6278;
 }
 .chevron {
   color: #5c6278;
@@ -425,7 +438,6 @@ async function handlePasswordChange() {
 .dropdown-email {
   font-size: 11px;
   color: #5c6278;
-  margin-top: 1px;
 }
 .dropdown-divider {
   height: 1px;
