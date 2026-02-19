@@ -18,3 +18,13 @@ export function refresh() {
     },
   );
 }
+
+export function logout() {
+  return api.post(
+    `${BASE}/logout`,
+    {},
+    {
+      withCredentials: true,
+    },
+  );
+}
