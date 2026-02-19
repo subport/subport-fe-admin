@@ -201,6 +201,16 @@ export interface GetEmailNotificationsParams {
   email?: string;
 }
 
+// 인증
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface TokenResponse {
+  accessToken: string;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
@@ -218,3 +228,21 @@ export const SUBSCRIPTION_TYPES = [
 ];
 
 export const AMOUNT_UNITS = ['KRW', 'USD'];
+
+// API 에러 코드
+export type ErrorCode =
+  // 로그인 관련 (사용자에게 표시)
+  | 'ADMIN_NOT_FOUND'
+  | 'ADMIN_PASSWORD_MISMATCH'
+  // 토큰 재발급/세션 관련 (낶부 처리용)
+  | 'ACCESS_TOKEN_EXPIRED'
+  | 'REFRESH_TOKEN_EXPIRED';
+
+// API 에러 응답 타입
+export interface ApiErrorResponse {
+  status: number;
+  error: string;
+  code: ErrorCode;
+  message: string;
+  fieldErrors: null | Record<string, string>;
+}
