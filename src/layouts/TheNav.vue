@@ -1,61 +1,223 @@
 <template>
-  <nav
-    class="TheNav d-flex flex-column p-3"
-    style="width: 250px; min-height: 100vh"
-  >
-    <div class="mb-4">
-      <h2 class="nav-title">subport</h2>
-    </div>
+  <nav class="the-nav">
+    <!-- 메뉴 그룹 -->
+    <div class="nav-section">
+      <span class="nav-section-label">메뉴</span>
+      <ul class="nav-list">
+        <li>
+          <RouterLink class="nav-item" active-class="active" to="/dashboard">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="2" y="3" width="20" height="14" rx="2" />
+              <line x1="8" y1="21" x2="16" y2="21" />
+              <line x1="12" y1="17" x2="12" y2="21" />
+            </svg>
+            대시보드
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink
+            class="nav-item"
+            active-class="active"
+            to="/subscriptions"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg>
 
-    <ul class="nav flex-column nav-menu">
-      <li class="nav-item">
-        <RouterLink class="nav-link" active-class="active" to="/subscriptions">
-          구독 서비스 목록
-        </RouterLink>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">회원 구독 정보 목록</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">회원 관리</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">통계</a>
-      </li>
-    </ul>
+            구독 서비스 관리
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink class="nav-item" active-class="active" to="/members">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            회원 관리
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink
+            class="nav-item"
+            active-class="active"
+            to="/email-notifications"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            이메일 발송 관리
+          </RouterLink>
+        </li>
+        <li>
+          <a class="nav-item disabled" href="#">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            FAQ 관리
+          </a>
+        </li>
+      </ul>
+    </div>
   </nav>
 </template>
 
 <script setup lang="ts"></script>
 
 <style scoped>
-.TheNav {
-  background-color: #6fcfc3;
-  font-family: 'Pretendard', sans-serif;
-  color: #000;
+.the-nav {
+  width: 220px;
+  min-height: 100vh;
+  background: #6fcfc3;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  padding: 20px 12px;
+  box-sizing: border-box;
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+}
+
+/* ── 로고 ─────────────────────────────────────────── */
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-bottom: 28px;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: background-color 0.15s;
+}
+.nav-logo:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+.logo-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f1f1e;
   flex-shrink: 0;
 }
-
-.TheNav .nav-title {
-  font-weight: 1000;
-  letter-spacing: 0.5px;
-  color: #000;
+.logo-text {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f1f1e;
+  letter-spacing: -0.3px;
 }
 
-.TheNav .nav-item {
-  margin-bottom: 5px;
+/* ── 섹션 ─────────────────────────────────────────── */
+.nav-section {
+  flex: 1;
 }
-
-.TheNav .nav-link {
+.nav-section-label {
   display: block;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-weight: 600;
-  color: #000;
-  transition: background-color 0.15s ease;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.35);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 0 10px;
+  margin-bottom: 6px;
+}
+.nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.TheNav .nav-link:hover {
-  background-color: rgba(0, 0, 0, 0.08);
+/* ── 메뉴 아이템 ──────────────────────────────────── */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.65);
+  text-decoration: none;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+  cursor: pointer;
+}
+.nav-item svg {
+  stroke: rgba(0, 0, 0, 0.55);
+  transition: stroke 0.15s;
+}
+.nav-item:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #000;
+}
+.nav-item:hover svg {
+  stroke: #000;
+}
+.nav-item.active {
+  background: rgba(0, 0, 0, 0.12);
+  color: #000;
+  font-weight: 700;
+}
+.nav-item.active svg {
+  stroke: #000;
+}
+.nav-item.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.nav-item.disabled:hover {
+  background: none;
+  color: rgba(0, 0, 0, 0.65);
+}
+.nav-item.disabled:hover svg {
+  stroke: rgba(0, 0, 0, 0.55);
 }
 </style>
