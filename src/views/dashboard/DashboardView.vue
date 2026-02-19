@@ -1,434 +1,402 @@
 <template>
   <div class="dashboard">
-    <!-- 로딩 중일 때 -->
-    <div v-if="isInitialLoading" class="loading-state">
-      <svg
-        class="loading-spinner"
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-      >
-        <polyline points="23 4 23 10 17 10" />
-        <polyline points="1 20 1 14 7 14" />
-        <path
-          d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
-        />
-      </svg>
-      <span>데이터를 불러오는 중...</span>
+    <!-- 헤더 -->
+    <div class="dashboard-header">
+      <div class="header-left">
+        <h1 class="dashboard-title">대시보드</h1>
+        <span class="dashboard-date">{{ todayFormatted }}</span>
+      </div>
+      <div class="header-right">
+        <span class="last-updated">마지막 업데이트 {{ lastUpdated }}</span>
+        <button
+          class="refresh-btn"
+          :class="{ spinning: isRefreshing }"
+          @click="refreshData"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <polyline points="23 4 23 10 17 10" />
+            <polyline points="1 20 1 14 7 14" />
+            <path
+              d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+            />
+          </svg>
+          새로고침
+        </button>
+      </div>
     </div>
 
-    <!-- 데이터 로드 완료 후 -->
-    <template v-else>
-      <!-- 헤더 -->
-      <div class="dashboard-header">
-        <div class="header-left">
-          <h1 class="dashboard-title">대시보드</h1>
-          <span class="dashboard-date">{{ todayFormatted }}</span>
-        </div>
-        <div class="header-right">
-          <span class="last-updated">마지막 업데이트 {{ lastUpdated }}</span>
-          <button
-            class="refresh-btn"
-            :class="{ spinning: isRefreshing }"
-            @click="refreshData"
+    <!-- 핵심 지표 카드 4개 -->
+    <div class="stats-grid">
+      <div
+        v-for="(stat, index) in statCards"
+        :key="index"
+        class="stat-card"
+        :style="{ animationDelay: `${index * 80}ms` }"
+      >
+        <div class="stat-icon" :class="stat.iconClass">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-            >
-              <polyline points="23 4 23 10 17 10" />
-              <polyline points="1 20 1 14 7 14" />
-              <path
-                d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
-              />
-            </svg>
-            새로고침
-          </button>
+            <path v-for="(d, pi) in stat.iconPaths" :key="pi" :d="d" />
+          </svg>
         </div>
-      </div>
-
-      <!-- 핵심 지표 카드 4개 -->
-      <div class="stats-grid">
-        <div
-          v-for="(stat, index) in statCards"
-          :key="index"
-          class="stat-card"
-          :style="{ animationDelay: `${index * 80}ms` }"
-        >
-          <div class="stat-icon" :class="stat.iconClass">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path v-for="(d, pi) in stat.iconPaths" :key="pi" :d="d" />
-            </svg>
-          </div>
-          <div class="stat-content">
-            <span class="stat-label">{{ stat.label }}</span>
-            <span class="stat-value">{{ stat.value.toLocaleString() }}</span>
-            <div class="stat-trend-row">
-              <template v-if="stat.showTrend">
-                <span
-                  class="stat-badge"
-                  :class="
-                    stat.trend > 0 ? 'up' : stat.trend < 0 ? 'down' : 'neutral'
-                  "
-                >
-                  <template v-if="stat.trend > 0">▲</template>
-                  <template v-else-if="stat.trend < 0">▼</template>
-                  <template v-else></template>
-                  {{ Math.abs(stat.trend) }}{{ stat.trendUnit }}
-                </span>
-                <span class="stat-sub">{{ stat.sub }}</span>
-              </template>
-            </div>
+        <div class="stat-content">
+          <span class="stat-label">{{ stat.label }}</span>
+          <span class="stat-value">{{ stat.value.toLocaleString() }}</span>
+          <div class="stat-trend-row">
+            <template v-if="stat.showTrend">
+              <span
+                class="stat-badge"
+                :class="
+                  stat.trend > 0 ? 'up' : stat.trend < 0 ? 'down' : 'neutral'
+                "
+              >
+                <template v-if="stat.trend > 0">▲</template>
+                <template v-else-if="stat.trend < 0">▼</template>
+                <template v-else></template>
+                {{ Math.abs(stat.trend) }}{{ stat.trendUnit }}
+              </span>
+              <span class="stat-sub">{{ stat.sub }}</span>
+            </template>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- 신규 가입자 추이 + 최근 가입 회원 -->
-      <div class="charts-row">
-        <!-- 바 차트 -->
-        <div class="chart-card">
-          <div class="chart-header">
-            <div>
-              <h3 class="chart-title">신규 가입자 추이</h3>
-              <p class="chart-sub">최근 2주 일별 신규 가입</p>
-            </div>
+    <!-- 신규 가입자 추이 + 최근 가입 회원 -->
+    <div class="charts-row">
+      <!-- 바 차트 -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <h3 class="chart-title">신규 가입자 추이</h3>
+            <p class="chart-sub">최근 2주 일별 신규 가입</p>
           </div>
-          <div class="chart-area">
-            <div class="bar-chart-wrapper">
-              <!-- 바 영역 -->
-              <div class="bar-chart-body">
-                <div
-                  v-for="(item, i) in signupBars"
-                  :key="i"
-                  class="bar-col"
-                  @mouseenter="hoveredBar = i"
-                  @mouseleave="hoveredBar = null"
-                >
-                  <div class="bar-track">
+        </div>
+        <div class="chart-area">
+          <div class="bar-chart-wrapper">
+            <!-- 바 영역 -->
+            <div class="bar-chart-body">
+              <div
+                v-for="(item, i) in signupBars"
+                :key="i"
+                class="bar-col"
+                @mouseenter="hoveredBar = i"
+                @mouseleave="hoveredBar = null"
+              >
+                <div class="bar-track">
+                  <div
+                    class="bar-fill"
+                    :class="{ highlight: item.isToday }"
+                    :style="{
+                      height: `${(item.value / maxSignup) * 100}%`,
+                      animationDelay: `${i * 40}ms`,
+                    }"
+                  >
+                    <!-- 툴팁: 바 높이가 낮으면(20% 미만) 바 위에, 아니면 바 상단 내부에 -->
                     <div
-                      class="bar-fill"
-                      :class="{ highlight: item.isToday }"
-                      :style="{
-                        height: `${(item.value / maxSignup) * 100}%`,
-                        animationDelay: `${i * 40}ms`,
+                      class="bar-tooltip"
+                      :class="{
+                        visible: hoveredBar === i,
+                        outside: item.value / maxSignup < 0.2,
                       }"
                     >
-                      <!-- 툴팁: 바 높이가 낮으면(20% 미만) 바 위에, 아니면 바 상단 내부에 -->
-                      <div
-                        class="bar-tooltip"
-                        :class="{
-                          visible: hoveredBar === i,
-                          outside: item.value / maxSignup < 0.2,
-                        }"
-                      >
-                        {{ item.value }}명
-                      </div>
+                      {{ item.value }}명
                     </div>
                   </div>
                 </div>
               </div>
-              <!-- 날짜 레이블 바닥 고정 -->
-              <div class="bar-labels">
-                <span
-                  v-for="(item, i) in signupBars"
-                  :key="i"
-                  class="bar-label"
-                  :class="{ today: item.isToday }"
-                  >{{ item.label }}</span
-                >
-              </div>
             </div>
-          </div>
-        </div>
-
-        <!-- 최근 가입 회원 -->
-        <div class="chart-card members-card">
-          <div class="chart-header">
-            <div class="card-title-wrap">
-              <span class="title-icon user">
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M12 7v5l3 2" />
-                </svg>
-              </span>
-              <span class="card-title-text">최근 가입 회원</span>
-            </div>
-            <router-link to="/members" class="see-all">전체 보기 →</router-link>
-          </div>
-          <div class="member-list">
-            <div
-              v-for="(member, i) in recentMembers"
-              :key="i"
-              class="member-row"
-            >
-              <div
-                class="member-avatar"
-                :style="{ background: getAvatarColor(member.nickname) }"
+            <!-- 날짜 레이블 바닥 고정 -->
+            <div class="bar-labels">
+              <span
+                v-for="(item, i) in signupBars"
+                :key="i"
+                class="bar-label"
+                :class="{ today: item.isToday }"
+                >{{ item.label }}</span
               >
-                {{ member.nickname.charAt(0).toUpperCase() }}
-              </div>
-              <div class="member-info">
-                <span class="member-name">{{ member.nickname }}</span>
-                <span class="member-email">{{ member.email }}</span>
-              </div>
-              <div class="member-meta">
-                <span class="member-subs"
-                  >구독 {{ member.memberSubscriptionCount }}개</span
-                >
-                <span class="member-joined">{{
-                  formatTime(member.createdAt)
-                }}</span>
-              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 하단: 이메일 알림 발송 현황(좌) + 우측 스택 -->
-      <div class="bottom-row">
-        <!-- 이메일 알림 발송 현황 -->
-        <div class="info-card noti-card">
-          <div class="info-card-header">
-            <div class="card-title-wrap">
-              <span class="title-icon alarm">
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <path
-                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                  />
-                  <polyline points="22,6 12,13 2,6" />
-                </svg>
-              </span>
-              <span class="card-title-text">오늘 이메일 발송 현황</span>
-            </div>
-            <router-link to="/email-notifications" class="see-all"
-              >전체 보기 →</router-link
-            >
-          </div>
-          <div class="noti-stat-row">
-            <div class="noti-stat">
-              <span class="noti-stat-num success">{{
-                todayEmailNotifications.successCount
-              }}</span>
-              <span class="noti-stat-label">발송 완료</span>
-            </div>
-            <div class="noti-divider" />
-            <div class="noti-stat">
-              <span class="noti-stat-num pending">{{
-                todayEmailNotifications.pendingCount
-              }}</span>
-              <span class="noti-stat-label">발송 예정</span>
-            </div>
-            <div class="noti-divider" />
-            <div class="noti-stat">
-              <span
-                class="noti-stat-num"
-                :class="
-                  todayEmailNotifications.failedCount > 0 ? 'error' : 'zero'
-                "
-                >{{ todayEmailNotifications.failedCount }}
-              </span>
-              <span class="noti-stat-label">실패</span>
-            </div>
-          </div>
-          <div class="noti-list">
-            <div
-              v-for="(noti, i) in todayEmailNotifications.notifications"
-              :key="i"
-              class="noti-row"
-            >
-              <span
-                class="noti-status-dot"
-                :class="noti.status.toLowerCase()"
-              />
-              <div class="noti-info">
-                <span class="noti-email">{{ noti.recipientEmail }}</span>
-                <span class="noti-desc"
-                  >구독 서비스 {{ noti.subscriptionCount }}건 결제,
-                  {{ noti.daysBeforePayment }}일 전 알림
-                </span>
-              </div>
-              <span class="noti-time">{{ formatNotiTime(noti.sentAt) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 우측 스택 -->
-        <div class="right-stack">
-          <!-- 구독 서비스 등록 현황 -->
-          <div class="info-card">
-            <div class="info-card-header">
-              <div class="card-title-wrap">
-                <span class="title-icon svc">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                  >
-                    <rect x="2" y="5" width="20" height="14" rx="2" />
-                    <line x1="2" y1="10" x2="22" y2="10" />
-                  </svg>
-                </span>
-                <span class="card-title-text">구독 서비스 등록 현황</span>
-              </div>
-            </div>
-            <div class="top-subscriptions-list">
-              <div
-                v-for="(svc, i) in topSubscriptions"
-                :key="i"
-                class="top-subscription-row"
-              >
-                <span class="rank-num">{{ i + 1 }}</span>
-                <div class="svc-logo-wrap">
-                  <img
-                    v-if="svc.subscriptionLogoImageUrl"
-                    :src="svc.subscriptionLogoImageUrl"
-                    :alt="svc.subscriptionName"
-                    class="svc-logo"
-                  />
-                  <span v-else class="svc-logo-fallback">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <rect x="2" y="3" width="20" height="14" rx="2" />
-                      <line x1="8" y1="21" x2="16" y2="21" />
-                      <line x1="12" y1="17" x2="12" y2="21" />
-                    </svg>
-                  </span>
-                </div>
-                <span class="svc-name">{{ svc.subscriptionName }}</span>
-                <div class="svc-bar-wrap">
-                  <div
-                    class="svc-bar"
-                    :style="{
-                      width:
-                        topSubscriptions && topSubscriptions.length > 0
-                          ? `${(svc.memberSubscriptionCount / topSubscriptions[0].memberSubscriptionCount) * 100}%`
-                          : '0%',
-                    }"
-                  />
-                </div>
-                <span class="svc-count"
-                  >{{ svc.memberSubscriptionCount }}명</span
-                >
-              </div>
-            </div>
-          </div>
-
-          <!-- 커스텀 구독 서비스 현황 -->
-          <div class="info-card">
-            <div class="info-card-header">
-              <div class="card-title-wrap">
-                <span class="title-icon custom">
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                  >
-                    <rect x="2" y="5" width="20" height="14" rx="2" />
-                    <line x1="2" y1="10" x2="22" y2="10" />
-                  </svg>
-                </span>
-                <span class="card-title-text">커스텀 구독 서비스 현황</span>
-              </div>
-            </div>
-
-            <!-- 데이터 있을 때 -->
-            <template
-              v-if="topCustomSubscriptions && topCustomSubscriptions.length > 0"
-            >
-              <div class="custom-list">
-                <div
-                  v-for="(item, i) in topCustomSubscriptions"
-                  :key="i"
-                  class="custom-row"
-                >
-                  <div class="custom-dot" />
-                  <span class="custom-name">{{
-                    item.normalizedSubscriptionName
-                  }}</span>
-                  <span v-if="i < 2" class="new-badge">추가 검토</span>
-                  <span class="custom-count-badge"
-                    >{{ item.memberSubscriptionCount }}명</span
-                  >
-                </div>
-              </div>
-              <p class="custom-hint">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                많이 등록된 서비스는 기본 제공 추가를 고려해보세요.
-              </p>
-            </template>
-
-            <!-- 데이터 없을 때 -->
-            <div v-else class="empty-state">
+      <!-- 최근 가입 회원 -->
+      <div class="chart-card members-card">
+        <div class="chart-header">
+          <div class="card-title-wrap">
+            <span class="title-icon user">
               <svg
-                width="32"
-                height="32"
+                width="15"
+                height="15"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="1.5"
+                stroke-width="2.5"
               >
-                <path d="M12 20h9" />
-                <path
-                  d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
-                />
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 2" />
               </svg>
-              <span>아직 등록된 커스텀 구독이 없어요</span>
+            </span>
+            <span class="card-title-text">최근 가입 회원</span>
+          </div>
+          <router-link to="/members" class="see-all">전체 보기 →</router-link>
+        </div>
+        <div class="member-list">
+          <div v-for="(member, i) in recentMembers" :key="i" class="member-row">
+            <div
+              class="member-avatar"
+              :style="{ background: getAvatarColor(member.nickname) }"
+            >
+              {{ member.nickname.charAt(0).toUpperCase() }}
+            </div>
+            <div class="member-info">
+              <span class="member-name">{{ member.nickname }}</span>
+              <span class="member-email">{{ member.email }}</span>
+            </div>
+            <div class="member-meta">
+              <span class="member-subs"
+                >구독 {{ member.memberSubscriptionCount }}개</span
+              >
+              <span class="member-joined">{{
+                formatTime(member.createdAt)
+              }}</span>
             </div>
           </div>
         </div>
       </div>
-    </template>
+    </div>
+
+    <!-- 하단: 이메일 알림 발송 현황(좌) + 우측 스택 -->
+    <div class="bottom-row">
+      <!-- 이메일 알림 발송 현황 -->
+      <div class="info-card noti-card">
+        <div class="info-card-header">
+          <div class="card-title-wrap">
+            <span class="title-icon alarm">
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                />
+                <polyline points="22,6 12,13 2,6" />
+              </svg>
+            </span>
+            <span class="card-title-text">오늘 이메일 발송 현황</span>
+          </div>
+          <router-link to="/email-notifications" class="see-all"
+            >전체 보기 →</router-link
+          >
+        </div>
+        <div class="noti-stat-row">
+          <div class="noti-stat">
+            <span class="noti-stat-num success">{{
+              todayEmailNotifications.successCount
+            }}</span>
+            <span class="noti-stat-label">발송 완료</span>
+          </div>
+          <div class="noti-divider" />
+          <div class="noti-stat">
+            <span class="noti-stat-num pending">{{
+              todayEmailNotifications.pendingCount
+            }}</span>
+            <span class="noti-stat-label">발송 예정</span>
+          </div>
+          <div class="noti-divider" />
+          <div class="noti-stat">
+            <span
+              class="noti-stat-num"
+              :class="
+                todayEmailNotifications.failedCount > 0 ? 'error' : 'zero'
+              "
+              >{{ todayEmailNotifications.failedCount }}
+            </span>
+            <span class="noti-stat-label">실패</span>
+          </div>
+        </div>
+        <div class="noti-list">
+          <div
+            v-for="(noti, i) in todayEmailNotifications.notifications"
+            :key="i"
+            class="noti-row"
+          >
+            <span class="noti-status-dot" :class="noti.status.toLowerCase()" />
+            <div class="noti-info">
+              <span class="noti-email">{{ noti.recipientEmail }}</span>
+              <span class="noti-desc"
+                >구독 서비스 {{ noti.subscriptionCount }}건 결제,
+                {{ noti.daysBeforePayment }}일 전 알림
+              </span>
+            </div>
+            <span class="noti-time">{{ formatNotiTime(noti.sentAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 우측 스택 -->
+      <div class="right-stack">
+        <!-- 구독 서비스 등록 현황 -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="card-title-wrap">
+              <span class="title-icon svc">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <rect x="2" y="5" width="20" height="14" rx="2" />
+                  <line x1="2" y1="10" x2="22" y2="10" />
+                </svg>
+              </span>
+              <span class="card-title-text">구독 서비스 등록 현황</span>
+            </div>
+          </div>
+          <div class="top-subscriptions-list">
+            <div
+              v-for="(svc, i) in topSubscriptions"
+              :key="i"
+              class="top-subscription-row"
+            >
+              <span class="rank-num">{{ i + 1 }}</span>
+              <div class="svc-logo-wrap">
+                <img
+                  v-if="svc.subscriptionLogoImageUrl"
+                  :src="svc.subscriptionLogoImageUrl"
+                  :alt="svc.subscriptionName"
+                  class="svc-logo"
+                />
+                <span v-else class="svc-logo-fallback">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="2" y="3" width="20" height="14" rx="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                  </svg>
+                </span>
+              </div>
+              <span class="svc-name">{{ svc.subscriptionName }}</span>
+              <div class="svc-bar-wrap">
+                <div
+                  class="svc-bar"
+                  :style="{
+                    width:
+                      topSubscriptions && topSubscriptions.length > 0
+                        ? `${(svc.memberSubscriptionCount / topSubscriptions[0].memberSubscriptionCount) * 100}%`
+                        : '0%',
+                  }"
+                />
+              </div>
+              <span class="svc-count">{{ svc.memberSubscriptionCount }}명</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 커스텀 구독 서비스 현황 -->
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="card-title-wrap">
+              <span class="title-icon custom">
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <rect x="2" y="5" width="20" height="14" rx="2" />
+                  <line x1="2" y1="10" x2="22" y2="10" />
+                </svg>
+              </span>
+              <span class="card-title-text">커스텀 구독 서비스 현황</span>
+            </div>
+          </div>
+
+          <!-- 데이터 있을 때 -->
+          <template
+            v-if="topCustomSubscriptions && topCustomSubscriptions.length > 0"
+          >
+            <div class="custom-list">
+              <div
+                v-for="(item, i) in topCustomSubscriptions"
+                :key="i"
+                class="custom-row"
+              >
+                <div class="custom-dot" />
+                <span class="custom-name">{{
+                  item.normalizedSubscriptionName
+                }}</span>
+                <span v-if="i < 2" class="new-badge">추가 검토</span>
+                <span class="custom-count-badge"
+                  >{{ item.memberSubscriptionCount }}명</span
+                >
+              </div>
+            </div>
+            <p class="custom-hint">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              많이 등록된 서비스는 기본 제공 추가를 고려해보세요.
+            </p>
+          </template>
+
+          <!-- 데이터 없을 때 -->
+          <div v-else class="empty-state">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M12 20h9" />
+              <path
+                d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+              />
+            </svg>
+            <span>아직 등록된 커스텀 구독이 없어요</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -453,7 +421,6 @@ import type { SignupBar, StatCard } from '@/types/dashboard';
 import { computed, onMounted, ref } from 'vue';
 
 // ── 상태 ─────────────────────────────────────────
-const isInitialLoading = ref<boolean>(true);
 const isRefreshing = ref<boolean>(false);
 const lastUpdated = ref<string>('방금 전');
 const hoveredBar = ref<number | null>(null);
@@ -712,8 +679,6 @@ onMounted(async () => {
     ]);
   } catch (e) {
     console.error('데이터 로드 실패:', e);
-  } finally {
-    isInitialLoading.value = false;
   }
 });
 </script>
