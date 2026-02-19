@@ -51,7 +51,7 @@ const routes = [
   {
     path: '/:pathMatch(.*)',
     component: NotFoundView,
-    meta: { requiresAuth: true },
+    meta: { layout: 'auth' },
   },
 ];
 
@@ -60,21 +60,22 @@ const router = createRouter({
   routes,
 });
 
-/*// ── 네비게이션 가드 ──────────────────────────────────
+// ── 네비게이션 가드 ──────────────────────────────────
 router.beforeEach((to, _from, next) => {
-  const isLoggedIn = !!localStorage.getItem('token'); // TODO: 실제 인증 상태로 교체
+  const token = localStorage.getItem('accessToken');
+  const isAuthenticated = !!token;
 
   // 인증 필요 페이지인데 비로그인 → 로그인으로
-  if (to.meta.requiresAuth && !isLoggedIn) {
+  if (to.meta.requiresAuth && !isAuthenticated) {
     return next('/login');
   }
 
   // 이미 로그인된 상태에서 /login 접근 → 대시보드로
-  if (to.path === '/login' && isLoggedIn) {
+  if (to.path === '/login' && isAuthenticated) {
     return next('/dashboard');
   }
 
   next();
-});*/
+});
 
 export default router;
