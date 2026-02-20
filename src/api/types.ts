@@ -246,7 +246,8 @@ export type ErrorCode =
   // 로그인 관련 (사용자에게 표시)
   | 'ADMIN_NOT_FOUND'
   | 'ADMIN_PASSWORD_MISMATCH'
-  // 토큰 재발급/세션 관련 (낶부 처리용)
+  | 'ADMIN_CURRENT_PASSWORD_MISMATCH'
+  // 토큰 재발급/세션 관련 (내부 처리용)
   | 'ACCESS_TOKEN_EXPIRED'
   | 'REFRESH_TOKEN_EXPIRED';
 

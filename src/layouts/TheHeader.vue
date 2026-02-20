@@ -122,9 +122,13 @@
             v-model="passwordForm.current"
             type="password"
             class="form-input"
+            :class="{ error: currentPasswordError }"
             placeholder="현재 비밀번호 입력"
             autocomplete="current-password"
           />
+          <span v-if="currentPasswordError" class="field-error">{{
+            currentPasswordError
+          }}</span>
         </div>
         <div class="form-field">
           <label class="form-label">새 비밀번호</label>
@@ -132,9 +136,13 @@
             v-model="passwordForm.next"
             type="password"
             class="form-input"
+            :class="{ error: newPasswordInvalid }"
             placeholder="새 비밀번호 입력"
             autocomplete="new-password"
           />
+          <span v-if="newPasswordInvalid" class="field-error"
+            >비밀번호는 12자 이상이어야 해요 (영문 + 숫자 + 특수문자)
+          </span>
         </div>
         <div class="form-field">
           <label class="form-label">새 비밀번호 확인</label>
@@ -179,9 +187,17 @@
 <script setup lang="ts">
 import { getProfile, updatePassword } from '@/api/account';
 import { logout as logoutApi } from '@/api/auth';
+import { isApiError } from '@/api/index';
 import type { ProfileResponse } from '@/api/types';
 import { useAuthStore } from '@/stores/auth';
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import {
+  computed,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from 'vue';
 
 const authStore = useAuthStore();
 
@@ -237,7 +253,14 @@ async function handleLogout() {
 // ── 비밀번호 변경 모달 ────────────────────────────────
 const passwordModalOpen = ref(false);
 const passwordForm = reactive({ current: '', next: '', confirm: '' });
+const currentPasswordError = ref('');
 
+const PASSWORD_REGEX =
+  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d])[\x21-\x7E]{12,}$/;
+
+const newPasswordInvalid = computed(
+  () => !!passwordForm.next && !PASSWORD_REGEX.test(passwordForm.next),
+);
 const passwordMismatch = computed(
   () => !!passwordForm.confirm && passwordForm.next !== passwordForm.confirm,
 );
@@ -246,11 +269,20 @@ const canSubmit = computed(
     passwordForm.current &&
     passwordForm.next &&
     passwordForm.confirm &&
+    !newPasswordInvalid.value &&
     !passwordMismatch.value,
+);
+
+watch(
+  () => passwordForm.current,
+  () => {
+    currentPasswordError.value = '';
+  },
 );
 
 function openPasswordModal() {
   dropdownOpen.value = false;
+  currentPasswordError.value = '';
   passwordModalOpen.value = true;
 }
 function closePasswordModal() {
@@ -258,6 +290,7 @@ function closePasswordModal() {
   passwordForm.current = '';
   passwordForm.next = '';
   passwordForm.confirm = '';
+  currentPasswordError.value = '';
 }
 async function handlePasswordChange() {
   if (!canSubmit.value) return;
@@ -270,6 +303,13 @@ async function handlePasswordChange() {
     alert('비밀번호가 변경되었습니다.');
     closePasswordModal();
   } catch (e) {
+    if (
+      isApiError(e) &&
+      e.response.data.code === 'ADMIN_CURRENT_PASSWORD_MISMATCH'
+    ) {
+      currentPasswordError.value = e.response.data.message;
+      return;
+    }
     console.error('비밀번호 변경 실패:', e);
     alert('비밀번호 변경에 실패했습니다.');
   }
