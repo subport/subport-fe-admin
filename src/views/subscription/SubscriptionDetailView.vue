@@ -250,8 +250,12 @@
                   v-model="subscriptionEditForm.name"
                   type="text"
                   class="form-input"
-                  required
+                  :class="{ error: subNameError }"
+                  @input="clearSubNameError"
                 />
+                <span v-if="subNameError" class="field-error">{{
+                  subNameError
+                }}</span>
               </div>
               <div class="form-field">
                 <label class="form-label"
@@ -261,7 +265,8 @@
                   <select
                     v-model="subscriptionEditForm.type"
                     class="custom-select"
-                    required
+                    :class="{ error: subTypeError }"
+                    @change="clearSubTypeError"
                   >
                     <option value="">선택</option>
                     <option
@@ -273,6 +278,9 @@
                     </option>
                   </select>
                 </div>
+                <span v-if="subTypeError" class="field-error">{{
+                  subTypeError
+                }}</span>
               </div>
             </div>
             <div class="form-field">
@@ -351,7 +359,7 @@
                   v-model="planRegisterForm.name"
                   type="text"
                   class="inline-input"
-                  required
+                  @input="clearPlanErrors"
                 />
               </td>
               <td class="col-amount">
@@ -359,15 +367,15 @@
                   v-model="planRegisterForm.amount"
                   type="text"
                   inputmode="numeric"
-                  class="inline-input text-right"
-                  required
+                  class="inline-input"
+                  @input="clearPlanErrors"
                 />
               </td>
               <td class="col-unit">
                 <select
                   v-model="planRegisterForm.amountUnit"
                   class="inline-select"
-                  required
+                  @change="clearPlanErrors"
                 >
                   <option value="">선택</option>
                   <option
@@ -386,7 +394,7 @@
                     type="text"
                     inputmode="numeric"
                     class="inline-input text-center"
-                    required
+                    @input="clearPlanErrors"
                   />
                   <span class="unit-label">개월</span>
                 </div>
@@ -429,6 +437,32 @@
                   </button>
                 </div>
               </td>
+            </tr>
+            <tr v-if="isAddingPlan && hasPlanErrors" class="error-row">
+              <td class="col-id"></td>
+              <td class="col-name">
+                <span v-if="planNameError" class="cell-error">{{
+                  planNameError
+                }}</span>
+              </td>
+              <td class="col-amount">
+                <span v-if="planAmountError" class="cell-error">{{
+                  planAmountError
+                }}</span>
+              </td>
+              <td class="col-unit">
+                <span v-if="planUnitError" class="cell-error">{{
+                  planUnitError
+                }}</span>
+              </td>
+              <td class="col-duration">
+                <span v-if="planDurationError" class="cell-error">{{
+                  planDurationError
+                }}</span>
+              </td>
+              <td class="col-date"></td>
+              <td class="col-date"></td>
+              <td class="col-action"></td>
             </tr>
 
             <!-- 기존 플랜 목록 -->
@@ -504,23 +538,32 @@
                     v-model="planEditForm.name"
                     type="text"
                     class="inline-input"
-                    required
+                    :class="{ error: planNameError }"
+                    @input="clearPlanErrors"
                   />
+                  <span v-if="planNameError" class="inline-error">{{
+                    planNameError
+                  }}</span>
                 </td>
                 <td class="col-amount">
                   <input
                     v-model="planEditForm.amount"
                     type="text"
                     inputmode="numeric"
-                    class="inline-input text-right"
-                    required
+                    class="inline-input"
+                    :class="{ error: planAmountError }"
+                    @input="clearPlanErrors"
                   />
+                  <span v-if="planAmountError" class="inline-error">{{
+                    planAmountError
+                  }}</span>
                 </td>
                 <td class="col-unit">
                   <select
                     v-model="planEditForm.amountUnit"
                     class="inline-select"
-                    required
+                    :class="{ error: planUnitError }"
+                    @change="clearPlanErrors"
                   >
                     <option
                       v-for="unit in AMOUNT_UNITS"
@@ -530,6 +573,9 @@
                       {{ unit }}
                     </option>
                   </select>
+                  <span v-if="planUnitError" class="inline-error">{{
+                    planUnitError
+                  }}</span>
                 </td>
                 <td class="col-duration">
                   <div class="duration-wrap">
@@ -537,11 +583,15 @@
                       v-model.number="planEditForm.durationMonths"
                       type="text"
                       inputmode="numeric"
-                      class="inline-input text-center"
-                      required
+                      class="inline-input"
+                      :class="{ error: planDurationError }"
+                      @input="clearPlanErrors"
                     />
                     <span class="unit-label">개월</span>
                   </div>
+                  <span v-if="planDurationError" class="inline-error">{{
+                    planDurationError
+                  }}</span>
                 </td>
                 <td class="col-date">{{ plan.createdAt }}</td>
                 <td class="col-date">{{ plan.lastModifiedAt }}</td>
@@ -592,9 +642,13 @@
       </div>
     </div>
   </div>
+
+  <Snackbar ref="snackbarRef" />
+  <ConfirmModal ref="confirmModalRef" />
 </template>
 
 <script setup lang="ts">
+import { isApiError } from '@/api/index';
 import { deletePlan, getPlans, registerPlan, updatePlan } from '@/api/plans';
 import {
   deleteSubscription,
@@ -611,7 +665,9 @@ import {
   type UpdatePlanRequest,
   type UpdateSubscriptionRequest,
 } from '@/api/types';
-import { onMounted, ref } from 'vue';
+import ConfirmModal from '@/components/ConfirmModal.vue';
+import Snackbar from '@/components/Snackbar.vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const route = useRoute();
@@ -619,6 +675,8 @@ const router = useRouter();
 
 // ── 구독 상태 ─────────────────────────────────────
 const subscriptionId = Number(route.params.id);
+const snackbarRef = ref<InstanceType<typeof Snackbar> | null>(null);
+const confirmModalRef = ref<InstanceType<typeof ConfirmModal> | null>(null);
 const subscription = ref<Subscription>({
   id: 0,
   name: '',
@@ -635,6 +693,8 @@ const subscriptionEditForm = ref({
   logoImageUrl: '',
 });
 const isEditingSubscription = ref(false);
+const subNameError = ref('');
+const subTypeError = ref('');
 const selectedLogoFile = ref<File | null>(null);
 const logoPreviewUrl = ref<string | null>(null);
 const logoInput = ref<HTMLInputElement | null>(null);
@@ -655,6 +715,19 @@ const planEditForm = ref<PlanForm>({
 });
 const isAddingPlan = ref(false);
 const editingPlanId = ref<number | null>(null);
+const planNameError = ref('');
+const planAmountError = ref('');
+const planUnitError = ref('');
+const planDurationError = ref('');
+
+const hasPlanErrors = computed(() => {
+  return !!(
+    planNameError.value ||
+    planAmountError.value ||
+    planUnitError.value ||
+    planDurationError.value
+  );
+});
 
 // ── 구독 조회 ─────────────────────────────────────
 const fetchSubscription = async () => {
@@ -663,7 +736,7 @@ const fetchSubscription = async () => {
     subscription.value = response.data;
   } catch (error) {
     console.error('구독 조회 실패:', error);
-    alert('조회에 실패했습니다.');
+    snackbarRef.value?.show('조회에 실패했습니다.', 'error');
   }
 };
 
@@ -690,48 +763,88 @@ const changeLogo = (event: Event) => {
     logoPreviewUrl.value = null;
   }
 };
-const handleUpdateSubscription = async () => {
-  if (subscriptionEditForm.value.name.length > 10) {
-    alert('이름은 최대 10자까지 가능합니다');
-    return;
+const clearSubNameError = () => {
+  subNameError.value = '';
+};
+const clearSubTypeError = () => {
+  subTypeError.value = '';
+};
+
+const validateSubscriptionEditForm = (): boolean => {
+  const name = subscriptionEditForm.value.name.trim();
+  const type = subscriptionEditForm.value.type;
+  let valid = true;
+
+  if (!name) {
+    subNameError.value = '서비스명을 입력해주세요';
+    valid = false;
+  } else if (name.length > 10) {
+    subNameError.value = '서비스명은 최대 10자까지 가능해요';
+    valid = false;
   }
+
+  if (!type) {
+    subTypeError.value = '타입을 선택해주세요';
+    valid = false;
+  }
+
+  return valid;
+};
+
+const handleUpdateSubscription = async () => {
+  if (!validateSubscriptionEditForm()) return;
+
   try {
     const formData: UpdateSubscriptionRequest = {
-      name: subscriptionEditForm.value.name,
+      name: subscriptionEditForm.value.name.trim(),
       type: subscriptionEditForm.value.type,
       planUrl: subscriptionEditForm.value.planUrl || undefined,
       image: selectedLogoFile.value || undefined,
     };
     await updateSubscription(subscriptionId, formData);
-    alert('구독 정보가 수정되었습니다.');
+    snackbarRef.value?.show('구독 서비스가 수정되었습니다.', 'success');
     isEditingSubscription.value = false;
     await fetchSubscription();
   } catch (error) {
     console.error('구독 수정 실패:', error);
-    alert('수정에 실패했습니다.');
+    snackbarRef.value?.show('수정에 실패했습니다.', 'error');
   }
 };
 const cancelUpdateSubscription = () => {
   isEditingSubscription.value = false;
   selectedLogoFile.value = null;
   logoPreviewUrl.value = null;
+  subNameError.value = '';
+  subTypeError.value = '';
 };
 
 // ── 구독 삭제 ─────────────────────────────────────
 const handleDeleteSubscription = async () => {
-  if (
-    !confirm(
-      '정말 이 구독 서비스를 삭제하시겠습니까?\n관련된 모든 플랜도 함께 삭제됩니다.',
-    )
-  )
-    return;
+  const confirmed = await confirmModalRef.value?.show(
+    '관련된 모든 플랜도 함께 삭제됩니다',
+    '정말 해당 구독 서비스를 삭제하시겠어요?',
+  );
+  if (!confirmed) return;
+
   try {
     await deleteSubscription(subscriptionId);
-    alert('삭제되었습니다.');
-    router.push('/subscriptions');
+    snackbarRef.value?.show('구독 서비스가 삭제되었습니다.', 'success');
+    setTimeout(() => {
+      router.push('/subscriptions');
+    }, 1000);
   } catch (error) {
-    console.error('구독 삭제 실패:', error);
-    alert('삭제에 실패했습니다.');
+    console.error('구독 서비스 삭제 실패:', error);
+    if (
+      isApiError(error) &&
+      error.response.data.code === 'SUBSCRIPTION_IN_USE'
+    ) {
+      snackbarRef.value?.show(
+        '회원이 사용 중인 구독은 삭제할 수 없습니다.',
+        'error',
+      );
+      return;
+    }
+    snackbarRef.value?.show('구독 서비스 삭제에 실패했습니다.', 'error');
   }
 };
 
@@ -742,7 +855,7 @@ const fetchPlans = async () => {
     plans.value = response.data.plans;
   } catch (error) {
     console.error('플랜 목록 조회 실패:', error);
-    alert('플랜 목록 조회에 실패했습니다.');
+    snackbarRef.value?.show('플랜 목록 조회에 실패했습니다.', 'error');
   }
 };
 
@@ -750,6 +863,7 @@ const fetchPlans = async () => {
 const startSavePlan = () => {
   isAddingPlan.value = true;
   editingPlanId.value = null;
+  clearPlanErrors();
   planRegisterForm.value = {
     name: '',
     amount: 0,
@@ -757,30 +871,79 @@ const startSavePlan = () => {
     durationMonths: 1,
   };
 };
-const savePlan = async () => {
-  const err = validatePlanForm(planRegisterForm.value);
-  if (err) {
-    alert(err);
-    return;
+const clearPlanErrors = () => {
+  planNameError.value = '';
+  planAmountError.value = '';
+  planUnitError.value = '';
+  planDurationError.value = '';
+};
+
+const validatePlanFormLocal = (form: PlanForm): boolean => {
+  const name = form.name.trim();
+  let valid = true;
+  clearPlanErrors();
+
+  if (!name) {
+    planNameError.value = '플랜명을 입력해주세요';
+    valid = false;
+  } else if (name.length > 10) {
+    planNameError.value = '플랜명은 최대 10자까지 가능해요';
+    valid = false;
   }
+
+  if (form.amount == null) {
+    planAmountError.value = '가격을 입력해주세요';
+    valid = false;
+  } else if (Number(form.amount) < 0) {
+    planAmountError.value = '가격은 0 이상으로 입력해주세요';
+    valid = false;
+  }
+
+  if (!form.amountUnit) {
+    planUnitError.value = '금액 단위를 선택해주세요';
+    valid = false;
+  }
+
+  if (form.durationMonths == null) {
+    planDurationError.value = '기간을 입력해주세요';
+    valid = false;
+  } else if (Number(form.durationMonths) < 1) {
+    planDurationError.value = '기간은 1개월 이상으로 입력해주세요';
+    valid = false;
+  }
+
+  return valid;
+};
+
+const savePlan = async () => {
+  if (!validatePlanFormLocal(planRegisterForm.value)) return;
+
   try {
     const data: RegisterPlanRequest = {
-      name: planRegisterForm.value.name,
-      amount: planRegisterForm.value.amount,
+      name: planRegisterForm.value.name.trim(),
+      amount: Number(planRegisterForm.value.amount),
       amountUnit: planRegisterForm.value.amountUnit,
-      durationMonths: planRegisterForm.value.durationMonths,
+      durationMonths: Number(planRegisterForm.value.durationMonths),
     };
     await registerPlan(subscriptionId, data);
-    alert('플랜이 추가되었습니다.');
+    snackbarRef.value?.show('플랜이 추가되었습니다.', 'success');
     isAddingPlan.value = false;
     await fetchPlans();
   } catch (error) {
     console.error('플랜 추가 실패:', error);
-    alert('플랜 추가에 실패했습니다.');
+    if (isApiError(error)) {
+      snackbarRef.value?.show(
+        error.response.data.message || '플랜 추가에 실패했습니다.',
+        'error',
+      );
+      return;
+    }
+    snackbarRef.value?.show('플랜 추가에 실패했습니다.', 'error');
   }
 };
 const cancelSavePlan = () => {
   isAddingPlan.value = false;
+  clearPlanErrors();
   planRegisterForm.value = {
     name: '',
     amount: 0,
@@ -793,6 +956,7 @@ const cancelSavePlan = () => {
 const startUpdatePlan = (plan: Plan) => {
   isAddingPlan.value = false;
   editingPlanId.value = plan.id;
+  clearPlanErrors();
   planEditForm.value = {
     name: plan.name,
     amount: plan.amount,
@@ -802,29 +966,34 @@ const startUpdatePlan = (plan: Plan) => {
 };
 const handleUpdatePlan = async () => {
   if (!editingPlanId.value) return;
-  const err = validatePlanForm(planEditForm.value);
-  if (err) {
-    alert(err);
-    return;
-  }
+  if (!validatePlanFormLocal(planEditForm.value)) return;
+
   try {
     const data: UpdatePlanRequest = {
-      name: planEditForm.value.name,
-      amount: planEditForm.value.amount,
+      name: planEditForm.value.name.trim(),
+      amount: Number(planEditForm.value.amount),
       amountUnit: planEditForm.value.amountUnit,
-      durationMonths: planEditForm.value.durationMonths,
+      durationMonths: Number(planEditForm.value.durationMonths),
     };
     await updatePlan(editingPlanId.value, data);
-    alert('플랜이 수정되었습니다.');
+    snackbarRef.value?.show('플랜이 수정되었습니다.', 'success');
     editingPlanId.value = null;
     await fetchPlans();
   } catch (error) {
     console.error('플랜 수정 실패:', error);
-    alert('플랜 수정에 실패했습니다.');
+    if (isApiError(error)) {
+      snackbarRef.value?.show(
+        error.response.data.message || '플랜 수정에 실패했습니다.',
+        'error',
+      );
+      return;
+    }
+    snackbarRef.value?.show('플랜 수정에 실패했습니다.', 'error');
   }
 };
 const cancelUpdatePlan = () => {
   editingPlanId.value = null;
+  clearPlanErrors();
   planEditForm.value = {
     name: '',
     amount: 0,
@@ -835,31 +1004,30 @@ const cancelUpdatePlan = () => {
 
 // ── 플랜 삭제 ─────────────────────────────────────
 const handleDeletePlan = async (planId: number) => {
-  if (!confirm('정말 삭제하시겠습니까?')) return;
+  const confirmed = await confirmModalRef.value?.show(
+    '해당 플랜이 삭제됩니다',
+    '정말 삭제하시겠어요?',
+  );
+  if (!confirmed) return;
+
   try {
     await deletePlan(planId);
-    alert('플랜이 삭제되었습니다.');
+    snackbarRef.value?.show('플랜이 삭제되었습니다.', 'success');
     await fetchPlans();
   } catch (error) {
     console.error('플랜 삭제 실패:', error);
-    alert('플랜 삭제에 실패했습니다.');
+    if (isApiError(error) && error.response.data.code === 'PLAN_IN_USE') {
+      snackbarRef.value?.show(
+        '회원이 사용 중인 플랜은 삭제할 수 없습니다.',
+        'error',
+      );
+      return;
+    }
+    snackbarRef.value?.show('플랜 삭제에 실패했습니다.', 'error');
   }
 };
 
 // ── 유틸 ──────────────────────────────────────────
-const validatePlanForm = (form: PlanForm): string | null => {
-  if (
-    !form.name ||
-    form.amount == null ||
-    !form.amountUnit ||
-    form.durationMonths == null
-  )
-    return '모든 값을 입력해주세요';
-  if (form.name.length > 10) return '이름은 최대 10자까지 가능합니다';
-  if (form.amount < 0) return '가격은 0원 이상이어야 합니다';
-  if (form.durationMonths < 1) return '기간은 1개월 이상이어야 합니다';
-  return null;
-};
 const formatAmount = (amount: number) => amount.toLocaleString();
 const goSubscriptionList = () => router.push('/subscriptions');
 
@@ -1197,6 +1365,16 @@ onMounted(() => {
 .form-input::placeholder {
   color: var(--text-muted);
 }
+.form-input.error {
+  border-color: #ff6b6b;
+}
+.custom-select.error {
+  border-color: #ff6b6b;
+}
+.field-error {
+  font-size: 11px;
+  color: #ff6b6b;
+}
 .select-wrap {
   position: relative;
 }
@@ -1301,27 +1479,27 @@ onMounted(() => {
 
 /* 컬럼 너비 */
 .col-id {
-  width: 56px;
+  width: 50px;
 }
 .col-name {
-  width: auto;
+  width: 130px;
 }
 .col-amount {
-  width: 100px;
+  width: 90px;
 }
 .col-unit {
-  width: 90px;
+  width: 80px;
 }
 .col-duration {
-  width: 90px;
+  width: 80px;
 }
 .col-date {
-  width: 110px;
+  width: 100px;
   font-size: 12px !important;
   color: var(--text-secondary) !important;
 }
 .col-action {
-  width: 90px;
+  width: 80px;
 }
 
 /* 수정 모드일 때 작업 컬럼: 저장/취소 버튼 2개가 들어갈 너비로 확장 */
@@ -1374,8 +1552,14 @@ onMounted(() => {
   outline: none;
   border-color: var(--mint);
 }
-.inline-input.text-right {
-  text-align: right;
+.inline-input.error {
+  border-color: #ff6b6b;
+}
+.inline-error {
+  display: block;
+  font-size: 10px;
+  color: #ff6b6b;
+  margin-top: 2px;
 }
 .inline-select {
   width: 100%;
@@ -1393,6 +1577,9 @@ onMounted(() => {
 .inline-select:focus {
   outline: none;
   border-color: var(--mint);
+}
+.inline-select.error {
+  border-color: #ff6b6b;
 }
 .inline-select option {
   background: var(--bg-raised);
@@ -1497,6 +1684,16 @@ onMounted(() => {
 .empty-cell span {
   font-size: 14px;
   display: block;
+}
+
+.error-row td {
+  padding: 4px 14px !important;
+}
+.cell-error {
+  font-size: 10px;
+  color: #ff6b6b;
+  display: block;
+  text-align: center;
 }
 
 /* ── 반응형 ──────────────────────────────────────── */

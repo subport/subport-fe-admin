@@ -182,6 +182,8 @@
       </div>
     </div>
   </div>
+
+  <Snackbar ref="snackbarRef" />
 </template>
 
 <script setup lang="ts">
@@ -189,6 +191,7 @@ import { getProfile, updatePassword } from '@/api/account';
 import { logout as logoutApi } from '@/api/auth';
 import { isApiError } from '@/api/index';
 import type { ProfileResponse } from '@/api/types';
+import Snackbar from '@/components/Snackbar.vue';
 import { useAuthStore } from '@/stores/auth';
 import {
   computed,
@@ -254,6 +257,7 @@ async function handleLogout() {
 const passwordModalOpen = ref(false);
 const passwordForm = reactive({ current: '', next: '', confirm: '' });
 const currentPasswordError = ref('');
+const snackbarRef = ref<InstanceType<typeof Snackbar> | null>(null);
 
 const PASSWORD_REGEX =
   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d])[\x21-\x7E]{12,}$/;
@@ -300,7 +304,7 @@ async function handlePasswordChange() {
       newPassword: passwordForm.next,
       confirmPassword: passwordForm.confirm,
     });
-    alert('비밀번호가 변경되었습니다.');
+    snackbarRef.value?.show('비밀번호가 변경되었습니다.', 'success');
     closePasswordModal();
   } catch (e) {
     if (
@@ -310,8 +314,7 @@ async function handlePasswordChange() {
       currentPasswordError.value = e.response.data.message;
       return;
     }
-    console.error('비밀번호 변경 실패:', e);
-    alert('비밀번호 변경에 실패했습니다.');
+    snackbarRef.value?.show('비밀번호 변경에 실패했습니다.', 'error');
   }
 }
 </script>

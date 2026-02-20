@@ -367,9 +367,12 @@
             <input
               type="text"
               class="form-input"
+              :class="{ error: nameError }"
               placeholder="서비스명을 입력하세요"
               v-model="subscriptionRegisterForm.name"
+              @input="clearNameError"
             />
+            <span v-if="nameError" class="field-error">{{ nameError }}</span>
           </div>
 
           <div class="form-field">
@@ -379,7 +382,9 @@
             <div class="select-wrap full">
               <select
                 class="custom-select full"
+                :class="{ error: typeError }"
                 v-model="subscriptionRegisterForm.type"
+                @change="clearTypeError"
               >
                 <option value="">선택</option>
                 <option
@@ -391,6 +396,7 @@
                 </option>
               </select>
             </div>
+            <span v-if="typeError" class="field-error">{{ typeError }}</span>
           </div>
 
           <div class="form-field">
@@ -425,6 +431,8 @@
       </div>
     </div>
   </div>
+
+  <Snackbar ref="snackbarRef" />
 </template>
 
 <script setup lang="ts">
@@ -436,6 +444,7 @@ import {
   type Subscription,
   type SubscriptionsResponse,
 } from '@/api/types';
+import Snackbar from '@/components/Snackbar.vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -454,6 +463,9 @@ const logoPreviewUrl = ref<string | null>(null);
 const logoInput = ref<HTMLInputElement | null>(null);
 const isAddingSubscription = ref(false);
 const isLoading = ref(false);
+const snackbarRef = ref<InstanceType<typeof Snackbar> | null>(null);
+const nameError = ref('');
+const typeError = ref('');
 
 const SORT_MAP: Record<string, string> = {
   '': 'id,asc',
@@ -526,30 +538,58 @@ const changeLogo = (event: Event) => {
   }
 };
 
-const saveSubscription = async () => {
-  if (subscriptionRegisterForm.value.name.length > 10) {
-    alert('이름은 최대 10자까지 가능합니다.');
-    return;
+const clearNameError = () => {
+  nameError.value = '';
+};
+const clearTypeError = () => {
+  typeError.value = '';
+};
+
+const validateSubscriptionForm = (): boolean => {
+  const name = subscriptionRegisterForm.value.name.trim();
+  const type = subscriptionRegisterForm.value.type;
+  let valid = true;
+
+  if (!name) {
+    nameError.value = '서비스명을 입력해주세요';
+    valid = false;
+  } else if (name.length > 10) {
+    nameError.value = '서비스명은 최대 10자까지 가능해요';
+    valid = false;
   }
+
+  if (!type) {
+    typeError.value = '타입을 선택해주세요';
+    valid = false;
+  }
+
+  return valid;
+};
+
+const saveSubscription = async () => {
+  if (!validateSubscriptionForm()) return;
+
   try {
     const formData: RegisterSubscriptionRequest = {
-      name: subscriptionRegisterForm.value.name,
+      name: subscriptionRegisterForm.value.name.trim(),
       type: subscriptionRegisterForm.value.type,
       planUrl: subscriptionRegisterForm.value.planUrl || undefined,
       image: selectedLogoFile.value || undefined,
     };
     await registerSubscription(formData);
-    alert('구독 서비스가 등록되었습니다.');
+    snackbarRef.value?.show('구독 서비스가 추가되었습니다.', 'success');
     isAddingSubscription.value = false;
     await fetchSubscriptions();
   } catch (error) {
-    console.error('구독 서비스 등록 실패:', error);
-    alert('등록에 실패했습니다.');
+    console.error('구독 서비스 추가 실패:', error);
+    snackbarRef.value?.show('구독 서비스 추가에 실패했습니다.', 'error');
   }
 };
 
 const cancelSaveSubscription = () => {
   isAddingSubscription.value = false;
+  nameError.value = '';
+  typeError.value = '';
   subscriptionRegisterForm.value = {
     name: '',
     type: '',
@@ -1280,6 +1320,16 @@ const pageNumbers = computed<(number | string)[]>(() => {
 }
 .form-input::placeholder {
   color: var(--text-muted);
+}
+.form-input.error {
+  border-color: #ff6b6b;
+}
+.custom-select.error {
+  border-color: #ff6b6b;
+}
+.field-error {
+  font-size: 11px;
+  color: #ff6b6b;
 }
 
 .modal-footer {
