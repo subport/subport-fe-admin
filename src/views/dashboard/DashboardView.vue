@@ -11,6 +11,7 @@
         <button
           class="refresh-btn"
           :class="{ spinning: isRefreshing }"
+          :disabled="isRefreshing"
           @click="refreshData"
         >
           <svg
@@ -253,7 +254,7 @@
 
       <!-- 우측 스택 -->
       <div class="right-stack">
-        <!-- 구독 서비스 등록 현황 -->
+        <!-- 구독 등록 현황 -->
         <div class="info-card">
           <div class="info-card-header">
             <div class="card-title-wrap">
@@ -270,56 +271,75 @@
                   <line x1="2" y1="10" x2="22" y2="10" />
                 </svg>
               </span>
-              <span class="card-title-text">구독 서비스 등록 현황</span>
+              <span class="card-title-text">구독 등록 현황</span>
             </div>
           </div>
-          <div class="top-subscriptions-list">
-            <div
-              v-for="(svc, i) in topSubscriptions"
-              :key="i"
-              class="top-subscription-row"
-            >
-              <span class="rank-num">{{ i + 1 }}</span>
-              <div class="svc-logo-wrap">
-                <img
-                  v-if="svc.subscriptionLogoImageUrl"
-                  :src="svc.subscriptionLogoImageUrl"
-                  :alt="svc.subscriptionName"
-                  class="svc-logo"
-                />
-                <span v-else class="svc-logo-fallback">
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <rect x="2" y="3" width="20" height="14" rx="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" />
-                    <line x1="12" y1="17" x2="12" y2="21" />
-                  </svg>
-                </span>
+
+          <template v-if="topSubscriptions && topSubscriptions.length > 0">
+            <div class="top-subscriptions-list">
+              <div
+                v-for="(svc, i) in topSubscriptions"
+                :key="i"
+                class="top-subscription-row"
+              >
+                <span class="rank-num">{{ i + 1 }}</span>
+                <div class="svc-logo-wrap">
+                  <img
+                    v-if="svc.subscriptionLogoImageUrl"
+                    :src="svc.subscriptionLogoImageUrl"
+                    :alt="svc.subscriptionName"
+                    class="svc-logo"
+                  />
+                  <span v-else class="svc-logo-fallback">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect x="2" y="3" width="20" height="14" rx="2" />
+                      <line x1="8" y1="21" x2="16" y2="21" />
+                      <line x1="12" y1="17" x2="12" y2="21" />
+                    </svg>
+                  </span>
+                </div>
+                <span class="svc-name">{{ svc.subscriptionName }}</span>
+                <div class="svc-bar-wrap">
+                  <div
+                    class="svc-bar"
+                    :style="{
+                      width:
+                        topSubscriptions && topSubscriptions.length > 0
+                          ? `${(svc.memberSubscriptionCount / topSubscriptions[0].memberSubscriptionCount) * 100}%`
+                          : '0%',
+                    }"
+                  />
+                </div>
+                <span class="svc-count"
+                  >{{ svc.memberSubscriptionCount }}명</span
+                >
               </div>
-              <span class="svc-name">{{ svc.subscriptionName }}</span>
-              <div class="svc-bar-wrap">
-                <div
-                  class="svc-bar"
-                  :style="{
-                    width:
-                      topSubscriptions && topSubscriptions.length > 0
-                        ? `${(svc.memberSubscriptionCount / topSubscriptions[0].memberSubscriptionCount) * 100}%`
-                        : '0%',
-                  }"
-                />
-              </div>
-              <span class="svc-count">{{ svc.memberSubscriptionCount }}명</span>
             </div>
+          </template>
+          <div v-else class="empty-state">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg>
+            <span>아직 등록된 구독이 없어요</span>
           </div>
         </div>
 
-        <!-- 커스텀 구독 서비스 현황 -->
+        <!-- 커스텀 구독 등록 현황 -->
         <div class="info-card">
           <div class="info-card-header">
             <div class="card-title-wrap">
@@ -336,7 +356,7 @@
                   <line x1="2" y1="10" x2="22" y2="10" />
                 </svg>
               </span>
-              <span class="card-title-text">커스텀 구독 서비스 현황</span>
+              <span class="card-title-text">커스텀 구독 등록 현황</span>
             </div>
           </div>
 
@@ -387,10 +407,8 @@
               stroke="currentColor"
               stroke-width="1.5"
             >
-              <path d="M12 20h9" />
-              <path
-                d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
-              />
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
             </svg>
             <span>아직 등록된 커스텀 구독이 없어요</span>
           </div>
@@ -422,7 +440,7 @@ import { computed, onMounted, ref } from 'vue';
 
 // ── 상태 ─────────────────────────────────────────
 const isRefreshing = ref<boolean>(false);
-const lastUpdated = ref<string>('방금 전');
+const lastUpdated = ref<string>('');
 const hoveredBar = ref<number | null>(null);
 
 // ── statCards: API 응답 → UI 카드 배열로 매핑 ────
@@ -598,6 +616,16 @@ function formatNotiTime(sentAt: string | null): string {
   return `${hh}:${mm}`;
 }
 
+function updateLastUpdated(): void {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const mm = String(now.getMinutes()).padStart(2, '0');
+  lastUpdated.value = `${y}.${m}.${d} ${hh}:${mm}`;
+}
+
 // ── 메서드 ────────────────────────────────────────
 async function fetchStats(): Promise<void> {
   try {
@@ -640,7 +668,7 @@ async function fetchTopSubscriptions(): Promise<void> {
     const { data } = await getTopSubscriptions();
     topSubscriptions.value = data.topSubscriptions;
   } catch (e) {
-    console.error('구독 서비스 등록 현황 조회 실패', e);
+    console.error('구독 등록 현황 조회 실패', e);
   }
 }
 
@@ -649,7 +677,7 @@ async function fetchTopCustomSubscriptions(): Promise<void> {
     const { data } = await getTopCustomSubscriptions();
     topCustomSubscriptions.value = data.topCustomSubscriptions;
   } catch (e) {
-    console.error('커스텀 구독 서비스 등록 현황 조회 실패', e);
+    console.error('커스텀 구독 등록 현황 조회 실패', e);
   }
 }
 
@@ -664,7 +692,7 @@ async function refreshData(): Promise<void> {
     fetchTopCustomSubscriptions(),
   ]);
   isRefreshing.value = false;
-  lastUpdated.value = '방금 전';
+  updateLastUpdated();
 }
 
 onMounted(async () => {
@@ -677,6 +705,7 @@ onMounted(async () => {
       fetchTopSubscriptions(),
       fetchTopCustomSubscriptions(),
     ]);
+    updateLastUpdated();
   } catch (e) {
     console.error('데이터 로드 실패:', e);
   }
@@ -770,6 +799,10 @@ onMounted(async () => {
 }
 .refresh-btn.spinning svg {
   animation: spin 0.8s linear infinite;
+}
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 @keyframes spin {
   to {
@@ -1265,7 +1298,7 @@ onMounted(async () => {
   white-space: nowrap;
 }
 
-/* ── 구독 서비스 등록 현황 ────────────────────────── */
+/* ── 구독 등록 현황 ────────────────────────── */
 .top-subscriptions-list {
   display: flex;
   flex-direction: column;
@@ -1332,7 +1365,7 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 
-/* ── 커스텀 구독 서비스 현황 ─────────────────────────────── */
+/* ── 커스텀 구독 등록 현황 ─────────────────────────────── */
 .custom-list {
   display: flex;
   flex-direction: column;
