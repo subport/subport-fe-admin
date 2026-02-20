@@ -1230,11 +1230,11 @@ function formatDateTime(dateTimeStr: string | null): string {
   color: var(--text-muted) !important;
 }
 .col-email {
-  width: auto;
+  width: 200px;
   text-align: left !important;
 }
 .col-count {
-  width: 90px;
+  width: 80px;
 }
 .col-payment {
   width: 90px;
@@ -1245,10 +1245,10 @@ function formatDateTime(dateTimeStr: string | null): string {
   width: 80px;
 }
 .col-status {
-  width: 120px;
+  width: 100px;
 }
 .col-time {
-  width: 140px;
+  width: 120px;
   font-size: 12px !important;
   color: var(--text-secondary) !important;
 }

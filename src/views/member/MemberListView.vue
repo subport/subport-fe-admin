@@ -794,34 +794,37 @@ function formatDate(isoString: string): string {
 }
 /* 컬럼 너비 */
 .col-id {
-  width: 52px;
+  width: 50px;
   color: var(--text-muted) !important;
   font-size: 12px !important;
 }
 .col-nickname {
-  width: 140px;
+  width: 110px;
 }
 .col-subs {
-  width: 72px;
+  width: 70px;
 }
 .col-custom {
-  width: 100px;
+  width: 80px;
 }
 .col-reminder {
-  width: 90px;
+  width: 80px;
 }
 .col-login {
-  width: 120px;
+  width: 100px;
   font-size: 12px !important;
   color: var(--text-secondary) !important;
 }
 .col-joined {
-  width: 100px;
+  width: 90px;
   font-size: 12px !important;
   color: var(--text-secondary) !important;
 }
+.col-email {
+  width: 200px;
+}
 .col-status {
-  width: 68px;
+  width: 70px;
 }
 
 .email-text {

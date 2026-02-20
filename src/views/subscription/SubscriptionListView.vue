@@ -1050,27 +1050,27 @@ const pageNumbers = computed<(number | string)[]>(() => {
   font-size: 12px !important;
 }
 .col-type {
-  width: 130px;
+  width: 110px;
 }
 .col-logo {
-  width: 90px;
+  width: 70px;
 }
 .col-name {
-  max-width: 160px;
+  width: 130px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .col-url {
-  width: 90px;
+  width: 100px;
 }
 .col-date {
-  width: 110px;
+  width: 100px;
   font-size: 12px !important;
   color: var(--text-secondary) !important;
 }
 .col-action {
-  width: 120px;
+  width: 110px;
   padding-left: 8px !important;
   padding-right: 16px !important;
 }
