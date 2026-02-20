@@ -247,6 +247,9 @@ export type ErrorCode =
   | 'ADMIN_NOT_FOUND'
   | 'ADMIN_PASSWORD_MISMATCH'
   | 'ADMIN_CURRENT_PASSWORD_MISMATCH'
+  // 구독/플랜 삭제 관련
+  | 'SUBSCRIPTION_IN_USE'
+  | 'PLAN_IN_USE'
   // 토큰 재발급/세션 관련 (내부 처리용)
   | 'ACCESS_TOKEN_EXPIRED'
   | 'REFRESH_TOKEN_EXPIRED';
