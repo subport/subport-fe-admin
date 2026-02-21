@@ -1,5 +1,6 @@
 import DashboardView from '@/views/dashboard/DashboardView.vue';
 import EmailNotificationListView from '@/views/emailnotification/EmailNotificationListView.vue';
+import FaqListView from '@/views/faq/FaqListView.vue';
 import LoginView from '@/views/LoginView.vue';
 import MemberListView from '@/views/member/MemberListView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
@@ -44,6 +45,11 @@ const routes = [
   {
     path: '/members',
     component: MemberListView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/faq',
+    component: FaqListView,
     meta: { requiresAuth: true },
   },
 
