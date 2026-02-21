@@ -1301,7 +1301,7 @@ function formatDateTime(dateTimeStr: string | null): string {
 
 /* ── 펼침 상세 ───────────────────────────────────── */
 .detail-row {
-  background: var(--bg-raised);
+  background: var(--bg-base);
   border-bottom: 1px solid var(--border);
 }
 .detail-row.is-failed {
