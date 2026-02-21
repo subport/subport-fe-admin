@@ -223,6 +223,19 @@ export interface ProfileResponse {
   email: string;
 }
 
+// FAQ
+export interface FaqsResponse {
+  faqs: Faq[];
+}
+
+export interface Faq {
+  id: number;
+  question: string;
+  answer: string;
+  createdAt: string;
+  lastModifiedAt: string;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
