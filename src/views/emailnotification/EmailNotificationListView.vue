@@ -751,7 +751,7 @@ function statusLabelWithRetry(item: EmailNotification): string {
 
 function formatDate(dateStr: string): string {
   const [year, month, day] = dateStr.split('-');
-  return `${year}.${month}.${day}`;
+  return `${year}-${month}-${day}`;
 }
 
 function formatDateTime(dateTimeStr: string | null): string {
@@ -762,7 +762,7 @@ function formatDateTime(dateTimeStr: string | null): string {
   const day = String(date.getDate()).padStart(2, '0');
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${year}.${month}.${day} ${hours}:${minutes}`;
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 </script>
 
@@ -1143,7 +1143,7 @@ function formatDateTime(dateTimeStr: string | null): string {
 
 /* ── 결과 요약 ───────────────────────────────────── */
 .result-summary {
-  margin-bottom: 10px;
+  margin-bottom: 13px;
 }
 .result-count {
   font-size: 13px;
@@ -1165,23 +1165,6 @@ function formatDateTime(dateTimeStr: string | null): string {
   display: flex;
   flex-direction: column;
 }
-.table-loading {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 0;
-}
-.loading-spinner {
-  animation: spin 0.8s linear infinite;
-  color: var(--text-muted);
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -1328,7 +1311,7 @@ function formatDateTime(dateTimeStr: string | null): string {
   padding: 0 !important;
 }
 .detail-content {
-  padding: 8px 14px 12px 54px;
+  padding: 14px 14px 14px 64px;
   animation: slideDown 0.2s ease;
 }
 @keyframes slideDown {
@@ -1346,7 +1329,7 @@ function formatDateTime(dateTimeStr: string | null): string {
   align-items: center;
   padding: 6px 0;
   border-bottom: 1px solid var(--border);
-  gap: 40px;
+  gap: 20px;
 }
 .detail-item:last-child {
   border-bottom: none;
