@@ -173,12 +173,6 @@
             </td>
             <td class="col-nickname">
               <div class="nickname-wrap">
-                <div
-                  class="avatar"
-                  :style="{ background: getAvatarColor(member.nickname) }"
-                >
-                  {{ member.nickname.charAt(0) }}
-                </div>
                 <span class="nickname-text">{{ member.nickname }}</span>
               </div>
             </td>
@@ -476,21 +470,6 @@ const pageNumbers = computed<(number | string)[]>(() => {
   pages.push(total);
   return pages;
 });
-
-// ── 유틸 ──────────────────────────────────────────
-function getAvatarColor(nickname: string): string {
-  const colors = [
-    '#4dabf7',
-    '#69db7c',
-    '#ffa94d',
-    '#da77f2',
-    '#ff8787',
-    '#66d9e8',
-    '#a9e34b',
-    '#f783ac',
-  ];
-  return colors[nickname.charCodeAt(0) % colors.length];
-}
 
 /**
  * 마지막 로그인 시각
@@ -799,7 +778,7 @@ function formatDate(isoString: string): string {
   font-size: 12px !important;
 }
 .col-nickname {
-  width: 110px;
+  width: 115px;
 }
 .col-subs {
   width: 70px;
@@ -821,7 +800,7 @@ function formatDate(isoString: string): string {
   color: var(--text-secondary) !important;
 }
 .col-email {
-  width: 200px;
+  width: 195px;
 }
 .col-status {
   width: 70px;
@@ -841,18 +820,6 @@ function formatDate(isoString: string): string {
   align-items: center;
   justify-content: center;
   gap: 7px;
-}
-.avatar {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: #fff;
-  flex-shrink: 0;
 }
 .nickname-text {
   font-size: 13px;
