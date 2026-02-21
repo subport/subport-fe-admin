@@ -83,7 +83,7 @@
           </RouterLink>
         </li>
         <li>
-          <RouterLink to="/faq" class="nav-item">
+          <RouterLink to="/faqs" class="nav-item">
             <svg
               width="16"
               height="16"

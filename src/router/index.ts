@@ -48,7 +48,7 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/faq',
+    path: '/faqs',
     component: FaqListView,
     meta: { requiresAuth: true },
   },
