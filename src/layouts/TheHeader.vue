@@ -10,7 +10,7 @@
             class="logo-img"
           />
         </span>
-        <span class="logo-text">subport</span>
+        <span class="logo-text">Subport</span>
       </RouterLink>
     </div>
 

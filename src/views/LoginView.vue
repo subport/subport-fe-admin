@@ -15,10 +15,10 @@
           alt="subport"
           class="logo-img"
         />
-        <span class="logo-text">subport</span>
+        <span class="logo-text">Subport</span>
       </div>
 
-      <h1 class="card-title">관리자 로그인</h1>
+      <h1 class="card-title">관리자 페이지</h1>
       <p class="card-sub">관리자 계정으로 로그인해주세요</p>
 
       <!-- 폼 -->
