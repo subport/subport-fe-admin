@@ -236,6 +236,16 @@ export interface Faq {
   lastModifiedAt: string;
 }
 
+export interface WriteFaqRequest {
+  question: string;
+  answer: string;
+}
+
+export interface UpdateFaqRequest {
+  question: string;
+  answer: string;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
