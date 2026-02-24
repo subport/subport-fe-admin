@@ -445,7 +445,7 @@ import {
   type SubscriptionsResponse,
 } from '@/api/types';
 import Snackbar from '@/components/Snackbar.vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -683,10 +683,6 @@ watch(
   },
   { immediate: true },
 );
-
-onMounted(() => {
-  fetchSubscriptions(true);
-});
 
 // ── 페이지 번호 계산 ──────────────────────────────
 const pageNumbers = computed<(number | string)[]>(() => {
