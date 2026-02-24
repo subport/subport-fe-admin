@@ -110,7 +110,7 @@
             </tr>
           </template>
 
-          <tr v-if="faqList.length === 0 && !isAddingFaq">
+          <tr v-if="!isLoading && faqList.length === 0 && !isAddingFaq">
             <td colspan="5" class="empty-cell">
               <svg
                 width="36"
@@ -267,13 +267,17 @@ const faqList = ref<Faq[]>([]);
 const isAddingFaq = ref(false);
 const editingFaqId = ref<number | null>(null);
 const expandedFaqIds = ref<Set<number>>(new Set());
+const isLoading = ref(false);
 
 const fetchFaqs = async () => {
+  isLoading.value = true;
   try {
     const response = await getFaqs();
     faqList.value = response.data.faqs;
   } catch (error) {
     console.error('FAQ 목록 조회 실패:', error);
+  } finally {
+    isLoading.value = false;
   }
 };
 
