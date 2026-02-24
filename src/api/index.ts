@@ -4,7 +4,7 @@ import type { ApiErrorResponse, TokenResponse } from './types';
 const ACCESS_TOKEN_KEY = 'accessToken';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/admin',
+  baseURL: 'https://api.subport.site/admin',
 });
 
 // 토큰 재발급 중인지 여부
@@ -63,7 +63,7 @@ api.interceptors.response.use(
       try {
         // Refresh API 호출 (withCredentials로 쿠키 전송)
         const refreshResponse = await axios.post<TokenResponse>(
-          'http://localhost:8080/admin/auth/refresh',
+          'https://api.subport.site/admin/auth/refresh',
           {},
           { withCredentials: true },
         );
