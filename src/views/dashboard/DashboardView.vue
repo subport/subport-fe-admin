@@ -325,7 +325,12 @@
               </div>
             </div>
           </template>
-          <div v-if="!isLoading" class="empty-state">
+          <div
+            v-if="
+              !isLoading && (!topSubscriptions || topSubscriptions.length === 0)
+            "
+            class="empty-state"
+          >
             <svg
               width="32"
               height="32"
@@ -404,7 +409,13 @@
           </template>
 
           <!-- 데이터 없을 때 -->
-          <div v-if="!isLoading" class="empty-state">
+          <div
+            v-if="
+              !isLoading &&
+              (!topCustomSubscriptions || topCustomSubscriptions.length === 0)
+            "
+            class="empty-state"
+          >
             <svg
               width="32"
               height="32"
