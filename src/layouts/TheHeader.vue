@@ -214,17 +214,18 @@ const profileRef = ref<HTMLElement | null>(null);
 
 function toggleDropdown() {
   dropdownOpen.value = !dropdownOpen.value;
-  if (dropdownOpen.value && !authStore.profile) {
-    authStore.fetchProfile();
-  }
 }
+
+onMounted(() => {
+  document.addEventListener('click', handleOutsideClick);
+  authStore.fetchProfile(); // 헤더 마운트 시 프로필 조회 (캐시되어 있으면 Skip)
+});
 
 function handleOutsideClick(e: MouseEvent) {
   if (profileRef.value && !profileRef.value.contains(e.target as Node)) {
     dropdownOpen.value = false;
   }
 }
-onMounted(() => document.addEventListener('click', handleOutsideClick));
 onBeforeUnmount(() =>
   document.removeEventListener('click', handleOutsideClick),
 );
