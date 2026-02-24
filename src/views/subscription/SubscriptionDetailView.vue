@@ -333,7 +333,7 @@
           </thead>
           <tbody>
             <!-- 플랜 없음 -->
-            <tr v-if="plans.length === 0 && !isAddingPlan">
+            <tr v-if="!isLoading && plans.length === 0 && !isAddingPlan">
               <td colspan="8" class="empty-cell">
                 <svg
                   width="36"
@@ -701,6 +701,7 @@ const logoInput = ref<HTMLInputElement | null>(null);
 
 // ── 플랜 상태 ─────────────────────────────────────
 const plans = ref<Plan[]>([]);
+const isLoading = ref(true);
 const planRegisterForm = ref<PlanForm>({
   name: '',
   amount: 0,
@@ -1031,9 +1032,15 @@ const handleDeletePlan = async (planId: number) => {
 const formatAmount = (amount: number) => amount.toLocaleString();
 const goSubscriptionList = () => router.push('/subscriptions');
 
-onMounted(() => {
-  fetchSubscription();
-  fetchPlans();
+onMounted(async () => {
+  isLoading.value = true;
+  try {
+    await Promise.all([fetchSubscription(), fetchPlans()]);
+  } catch (e) {
+    console.error('데이터 로드 실패:', e);
+  } finally {
+    isLoading.value = false;
+  }
 });
 </script>
 

@@ -679,7 +679,7 @@ watch(
     sort.value = (query.sort as string) || '';
     appliedName.value = (query.name as string) || '';
     searchedName.value = appliedName.value;
-    fetchSubscriptions();
+    fetchSubscriptions(true);
   },
   { immediate: true },
 );

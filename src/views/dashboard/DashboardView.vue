@@ -275,7 +275,9 @@
             </div>
           </div>
 
-          <template v-if="topSubscriptions && topSubscriptions.length > 0">
+          <template
+            v-if="!isLoading && topSubscriptions && topSubscriptions.length > 0"
+          >
             <div class="top-subscriptions-list">
               <div
                 v-for="(svc, i) in topSubscriptions"
@@ -323,7 +325,7 @@
               </div>
             </div>
           </template>
-          <div v-else class="empty-state">
+          <div v-if="!isLoading" class="empty-state">
             <svg
               width="32"
               height="32"
@@ -362,7 +364,11 @@
 
           <!-- 데이터 있을 때 -->
           <template
-            v-if="topCustomSubscriptions && topCustomSubscriptions.length > 0"
+            v-if="
+              !isLoading &&
+              topCustomSubscriptions &&
+              topCustomSubscriptions.length > 0
+            "
           >
             <div class="custom-list">
               <div
@@ -398,7 +404,7 @@
           </template>
 
           <!-- 데이터 없을 때 -->
-          <div v-else class="empty-state">
+          <div v-if="!isLoading" class="empty-state">
             <svg
               width="32"
               height="32"
@@ -503,6 +509,7 @@ function buildStatCards(data: DashboardStatsResponse): StatCard[] {
 }
 
 const signupBars = ref<SignupBar[]>([]);
+const isLoading = ref(true);
 
 function buildSignupBars(data: SignupTrendsResponse): SignupBar[] {
   const today = new Intl.DateTimeFormat('en-CA', {
@@ -708,6 +715,8 @@ onMounted(async () => {
     updateLastUpdated();
   } catch (e) {
     console.error('데이터 로드 실패:', e);
+  } finally {
+    isLoading.value = false;
   }
 });
 </script>
