@@ -1,5 +1,10 @@
 import { login, refresh } from '@/api/auth';
-import type { ApiErrorResponse, LoginRequest } from '@/api/types';
+import { getProfile } from '@/api/account';
+import type {
+  ApiErrorResponse,
+  LoginRequest,
+  ProfileResponse,
+} from '@/api/types';
 import router from '@/router';
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
@@ -13,6 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
   );
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+  const profile = ref<ProfileResponse | null>(null);
 
   // Getters
   const isAuthenticated = computed(() => !!accessToken.value);
@@ -72,18 +78,31 @@ export const useAuthStore = defineStore('auth', () => {
   const logout = () => {
     setAccessToken(null);
     error.value = null;
+    profile.value = null;
     router.push('/login');
+  };
+
+  const fetchProfile = async () => {
+    if (profile.value) return; // 이미 있으면 조회 안 함
+    try {
+      const { data } = await getProfile();
+      profile.value = data;
+    } catch (e) {
+      console.error('프로필 조회 실패:', e);
+    }
   };
 
   return {
     accessToken,
     isLoading,
     error,
+    profile,
     isAuthenticated,
     setAccessToken,
     clearError,
     loginAction,
     refreshToken,
     logout,
+    fetchProfile,
   };
 });

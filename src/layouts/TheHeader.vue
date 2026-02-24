@@ -187,10 +187,9 @@
 </template>
 
 <script setup lang="ts">
-import { getProfile, updatePassword } from '@/api/account';
+import { updatePassword } from '@/api/account';
 import { logout as logoutApi } from '@/api/auth';
 import { isApiError } from '@/api/index';
-import type { ProfileResponse } from '@/api/types';
 import Snackbar from '@/components/Snackbar.vue';
 import { useAuthStore } from '@/stores/auth';
 import {
@@ -205,24 +204,9 @@ import {
 const authStore = useAuthStore();
 
 // ── 관리자 정보 ──────────────────────────────────────
-const profile = ref<ProfileResponse | null>(null);
-const adminName = computed(() => profile.value?.nickname ?? '관리자');
-const adminEmail = computed(() => profile.value?.email ?? '');
+const adminName = computed(() => authStore.profile?.nickname ?? '관리자');
+const adminEmail = computed(() => authStore.profile?.email ?? '');
 const adminInitial = computed(() => adminName.value.charAt(0));
-
-// 프로필 조회
-async function fetchProfile() {
-  try {
-    const { data } = await getProfile();
-    profile.value = data;
-  } catch (e) {
-    console.error('프로필 조회 실패:', e);
-  }
-}
-
-onMounted(() => {
-  fetchProfile();
-});
 
 // ── 드롭다운 ──────────────────────────────────────────
 const dropdownOpen = ref(false);
@@ -230,6 +214,9 @@ const profileRef = ref<HTMLElement | null>(null);
 
 function toggleDropdown() {
   dropdownOpen.value = !dropdownOpen.value;
+  if (dropdownOpen.value && !authStore.profile) {
+    authStore.fetchProfile();
+  }
 }
 
 function handleOutsideClick(e: MouseEvent) {
