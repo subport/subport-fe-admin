@@ -110,7 +110,7 @@ export interface TopSubscriptionsResponse {
 export interface TopSubscription {
   subscriptionName: string;
   subscriptionLogoImageUrl: string;
-  memberSubscriptionCount: number;
+  memberCount: number;
 }
 
 export interface TopCustomSubscriptionsResponse {
@@ -119,7 +119,7 @@ export interface TopCustomSubscriptionsResponse {
 
 export interface TopCustomSubscription {
   normalizedSubscriptionName: string;
-  memberSubscriptionCount: number;
+  memberCount: number;
 }
 
 export interface TodayEmailNotificationsResponse {

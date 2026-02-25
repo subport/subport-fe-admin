@@ -314,14 +314,12 @@
                     :style="{
                       width:
                         topSubscriptions && topSubscriptions.length > 0
-                          ? `${(svc.memberSubscriptionCount / topSubscriptions[0].memberSubscriptionCount) * 100}%`
+                          ? `${(svc.memberCount / topSubscriptions[0].memberCount) * 100}%`
                           : '0%',
                     }"
                   />
                 </div>
-                <span class="svc-count"
-                  >{{ svc.memberSubscriptionCount }}명</span
-                >
+                <span class="svc-count">{{ svc.memberCount }}명</span>
               </div>
             </div>
           </template>
@@ -386,9 +384,7 @@
                   item.normalizedSubscriptionName
                 }}</span>
                 <span v-if="i < 2" class="new-badge">추가 검토</span>
-                <span class="custom-count-badge"
-                  >{{ item.memberSubscriptionCount }}명</span
-                >
+                <span class="custom-count-badge">{{ item.memberCount }}명</span>
               </div>
             </div>
             <p class="custom-hint">
