@@ -609,27 +609,12 @@ const goSubscriptionDetail = (id: number) => {
 const onSortChange = (value: string) => {
   sort.value = value;
   currentPage.value = 1;
-  router.replace({
-    query: {
-      ...(currentPage.value > 1 ? { page: String(currentPage.value) } : {}),
-      type: selectedType.value || undefined,
-      sort: sort.value || undefined,
-      name: appliedName.value || undefined,
-    },
-  });
 };
 
 const clearSearch = () => {
   searchedName.value = '';
   appliedName.value = '';
   currentPage.value = 1;
-  router.replace({
-    query: {
-      ...(currentPage.value > 1 ? { page: String(currentPage.value) } : {}),
-      type: selectedType.value || undefined,
-      sort: sort.value || undefined,
-    },
-  });
 };
 
 const resetFilters = () => {
@@ -638,9 +623,6 @@ const resetFilters = () => {
   searchedName.value = '';
   appliedName.value = '';
   currentPage.value = 1;
-  router.replace({
-    query: {},
-  });
 };
 
 const goToPage = (page: number) => {
@@ -650,17 +632,14 @@ const goToPage = (page: number) => {
 
 const handleSearch = () => {
   appliedName.value = searchedName.value;
-  router.replace({
-    query: {
-      ...(currentPage.value > 1 ? { page: String(currentPage.value) } : {}),
-      type: selectedType.value || undefined,
-      sort: sort.value || undefined,
-      name: appliedName.value || undefined,
-    },
-  });
+  currentPage.value = 1;
 };
 
-watch([currentPage, selectedType, sort], () => {
+watch(selectedType, () => {
+  currentPage.value = 1;
+});
+
+watch([sort, currentPage], () => {
   router.replace({
     query: {
       ...(currentPage.value > 1 ? { page: String(currentPage.value) } : {}),
