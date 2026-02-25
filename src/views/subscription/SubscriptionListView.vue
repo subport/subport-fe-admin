@@ -42,7 +42,11 @@
             />
             <line x1="7" y1="7" x2="7.01" y2="7" />
           </svg>
-          <select v-model="selectedType" class="custom-select">
+          <select
+            :value="selectedType"
+            class="custom-select"
+            @change="onTypeChange($event)"
+          >
             <option value="">전체 타입</option>
             <option
               v-for="type in SUBSCRIPTION_TYPES"
@@ -606,15 +610,26 @@ const goSubscriptionDetail = (id: number) => {
   router.push(`/subscriptions/${id}`);
 };
 
+const onTypeChange = (event: Event) => {
+  selectedType.value = (event.target as HTMLSelectElement).value;
+  currentPage.value = 1;
+  updateQueryParams();
+  fetchSubscriptions();
+};
+
 const onSortChange = (value: string) => {
   sort.value = value;
   currentPage.value = 1;
+  updateQueryParams();
+  fetchSubscriptions();
 };
 
 const clearSearch = () => {
   searchedName.value = '';
   appliedName.value = '';
   currentPage.value = 1;
+  updateQueryParams();
+  fetchSubscriptions();
 };
 
 const resetFilters = () => {
@@ -623,23 +638,25 @@ const resetFilters = () => {
   searchedName.value = '';
   appliedName.value = '';
   currentPage.value = 1;
+  router.replace({ query: {} });
+  fetchSubscriptions();
 };
 
 const goToPage = (page: number) => {
   if (page < 1 || page > totalPages.value) return;
   currentPage.value = page;
+  updateQueryParams();
+  fetchSubscriptions();
 };
 
 const handleSearch = () => {
   appliedName.value = searchedName.value;
   currentPage.value = 1;
+  updateQueryParams();
+  fetchSubscriptions();
 };
 
-watch(selectedType, () => {
-  currentPage.value = 1;
-});
-
-watch([sort, currentPage], () => {
+const updateQueryParams = () => {
   router.replace({
     query: {
       ...(currentPage.value > 1 ? { page: String(currentPage.value) } : {}),
@@ -648,7 +665,7 @@ watch([sort, currentPage], () => {
       name: appliedName.value || undefined,
     },
   });
-});
+};
 
 watch(
   () => route.query,
