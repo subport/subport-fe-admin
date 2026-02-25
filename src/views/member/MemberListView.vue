@@ -134,7 +134,7 @@
             <th class="col-subs">구독</th>
             <th class="col-custom">커스텀 구독</th>
             <th class="col-reminder">알림</th>
-            <th class="col-login">마지막 로그인</th>
+            <th class="col-login">마지막 활동</th>
             <th class="col-joined">가입일</th>
             <th class="col-status">상태</th>
           </tr>
@@ -205,7 +205,7 @@
             </td>
             <td class="col-login">
               <span class="date-text">{{
-                member.lastLoginAt ? formatLoginTime(member.lastLoginAt) : '-'
+                member.lastActiveAt ? formatLoginTime(member.lastActiveAt) : '-'
               }}</span>
             </td>
             <td class="col-joined">
@@ -305,7 +305,7 @@ const filters = reactive<{
 const SORT_MAP: Record<string, string> = {
   default: 'id,asc',
   recent: 'createdAt,desc',
-  loggedIn: 'lastLoginAt,desc',
+  loggedIn: 'lastActiveAt,desc',
 };
 
 const selectedSort = ref('default');
@@ -472,7 +472,7 @@ const pageNumbers = computed<(number | string)[]>(() => {
 });
 
 /**
- * 마지막 로그인 시각
+ * 마지막 활동 시각
  * - 오늘: n초 전 / n분 전 / n시간 전
  * - 오늘 이전: YYYY.MM.DD
  */

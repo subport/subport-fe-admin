@@ -152,7 +152,7 @@ export interface Member {
   memberSubscriptionCount: number;
   customSubscriptionCount: number;
   reminderDaysBefore: number;
-  lastLoginAt: string;
+  lastActiveAt: string;
   createdAt: string;
   deleted: boolean;
 }
