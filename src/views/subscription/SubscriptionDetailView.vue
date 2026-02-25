@@ -1440,8 +1440,8 @@ onMounted(async () => {
 
 /* ── 테이블 ──────────────────────────────────────── */
 .table-wrap {
-  overflow: visible;
-} /* floating-actions가 테이블 밖으로 나올 수 있게 */
+  overflow-x: auto;
+}
 .data-table {
   width: 100%;
   border-collapse: collapse;

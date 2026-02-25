@@ -1159,7 +1159,7 @@ function formatDateTime(dateTimeStr: string | null): string {
   background: var(--bg-surface);
   border-radius: 14px;
   border: 1px solid var(--border);
-  overflow: hidden;
+  overflow-x: auto;
   margin-bottom: 20px;
   min-height: auto;
   display: flex;
