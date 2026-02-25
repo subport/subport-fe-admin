@@ -384,7 +384,7 @@
                   item.normalizedSubscriptionName
                 }}</span>
                 <span v-if="i < 2" class="new-badge">추가 검토</span>
-                <span class="custom-count-badge">{{ item.memberCount }}명</span>
+                <span class="custom-count">{{ item.memberCount }}명</span>
               </div>
             </div>
             <p class="custom-hint">
@@ -1390,7 +1390,7 @@ onMounted(async () => {
 .custom-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   padding: 7px 0;
   border-bottom: 1px solid var(--border);
 }
@@ -1398,25 +1398,23 @@ onMounted(async () => {
   border-bottom: none;
 }
 .custom-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--border-mid);
   flex-shrink: 0;
 }
 .custom-name {
-  flex: 1;
   font-size: 13px;
-  color: var(--text-primary);
+  font-weight: 500;
+  flex: 1;
 }
-.custom-count-badge {
-  font-size: 11px;
-  font-weight: 600;
+.custom-count {
+  font-size: 12px;
   color: var(--text-secondary);
-  background: var(--bg-raised);
-  padding: 2px 8px;
-  border-radius: 10px;
-  border: 1px solid var(--border-mid);
+  width: 20px;
+  text-align: right;
+  flex-shrink: 0;
 }
 .new-badge {
   font-size: 10px;
