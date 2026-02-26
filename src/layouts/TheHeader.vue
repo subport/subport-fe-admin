@@ -2,7 +2,7 @@
   <header class="the-header">
     <!-- 왼쪽: 현재 페이지 타이틀 -->
     <div class="header-left">
-      <RouterLink to="/dashboard" class="header-logo">
+      <RouterLink to="/" class="header-logo">
         <span>
           <img
             src="https://objectstorage.ap-chuncheon-1.oraclecloud.com/n/axnklumwzgke/b/subpport-bucket/o/subport_logo_no_background.png"
@@ -316,7 +316,7 @@ async function handlePasswordChange() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 18px 0 10px;
+  padding: 0 18px 0 18px;
   font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
   flex-shrink: 0;
   position: sticky;
@@ -329,14 +329,11 @@ async function handlePasswordChange() {
   align-items: center;
   gap: 0;
   text-decoration: none;
-  padding: 6px 10px;
+  padding: 0px 10px 0px 0px;
   border-radius: 8px;
   transition: background-color 0.15s;
   flex-shrink: 0;
   max-height: 100%;
-}
-.header-logo:hover {
-  background: rgba(255, 255, 255, 0.05);
 }
 .logo-img {
   width: 55px;
