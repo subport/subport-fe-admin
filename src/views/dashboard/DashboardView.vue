@@ -363,6 +363,7 @@
               </span>
               <span class="card-title-text">커스텀 구독 등록 현황</span>
             </div>
+            <span class="custom-threshold-hint">✲ 2명 이상 등록 시 집계</span>
           </div>
 
           <!-- 데이터 있을 때 -->
@@ -1431,6 +1432,10 @@ onMounted(async () => {
   font-size: 11px;
   color: var(--text-muted);
   margin: 0;
+}
+.custom-threshold-hint {
+  font-size: 11px;
+  color: var(--text-muted);
 }
 .empty-state {
   display: flex;
