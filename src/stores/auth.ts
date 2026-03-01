@@ -1,5 +1,5 @@
-import { login, refresh } from '@/api/auth';
 import { getProfile } from '@/api/account';
+import { login, refresh } from '@/api/auth';
 import type {
   ApiErrorResponse,
   LoginRequest,
@@ -7,7 +7,7 @@ import type {
 } from '@/api/types';
 import router from '@/router';
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
 

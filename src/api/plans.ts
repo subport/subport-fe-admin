@@ -1,7 +1,7 @@
 import api from '.';
 import type {
-  RegisterPlanRequest,
   PlansResponse,
+  RegisterPlanRequest,
   UpdatePlanRequest,
 } from './types';
 
