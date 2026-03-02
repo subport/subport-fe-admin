@@ -330,37 +330,48 @@
 
         <div class="modal-body">
           <!-- 로고 업로드 -->
-          <div class="logo-upload-wrap">
-            <div class="logo-upload-box" @click="logoInput?.click()">
-              <template v-if="!logoPreviewUrl">
-                <svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
+          <div class="logo-upload-container">
+            <div class="logo-upload-outer">
+              <div class="logo-upload-wrap">
+                <div
+                  class="logo-upload-box"
+                  :class="{ error: logoError }"
+                  @click="logoInput?.click()"
                 >
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <line x1="12" y1="8" x2="12" y2="16" />
-                  <line x1="8" y1="12" x2="16" y2="12" />
-                </svg>
-                <span class="logo-upload-hint">로고 업로드</span>
-              </template>
-              <img
-                v-else
-                :src="logoPreviewUrl"
-                alt="logo preview"
-                class="logo-preview-img"
-              />
+                  <template v-if="!logoPreviewUrl">
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <line x1="12" y1="8" x2="12" y2="16" />
+                      <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                    <span class="logo-upload-hint"
+                      >로고 업로드 <span class="required">*</span></span
+                    >
+                  </template>
+                  <img
+                    v-else
+                    :src="logoPreviewUrl"
+                    alt="logo preview"
+                    class="logo-preview-img"
+                  />
+                </div>
+                <input
+                  ref="logoInput"
+                  type="file"
+                  class="hidden-input"
+                  accept="image/*"
+                  @change="changeLogo"
+                />
+              </div>
+              <span v-if="logoError" class="field-error">{{ logoError }}</span>
             </div>
-            <input
-              ref="logoInput"
-              type="file"
-              class="hidden-input"
-              accept="image/*"
-              @change="changeLogo"
-            />
           </div>
 
           <!-- 폼 필드 -->
@@ -470,6 +481,7 @@ const isLoading = ref(false);
 const snackbarRef = ref<InstanceType<typeof Snackbar> | null>(null);
 const nameError = ref('');
 const typeError = ref('');
+const logoError = ref('');
 
 const SORT_MAP: Record<string, string> = {
   '': 'id,asc',
@@ -520,6 +532,8 @@ const fetchSubscriptions = async (isInitial = false) => {
 
 const startSaveSubscription = () => {
   isAddingSubscription.value = true;
+  selectedLogoFile.value = null;
+  logoPreviewUrl.value = null;
   subscriptionRegisterForm.value = {
     name: '',
     type: '',
@@ -540,6 +554,7 @@ const changeLogo = (event: Event) => {
   } else {
     logoPreviewUrl.value = null;
   }
+  clearLogoError();
 };
 
 const clearNameError = () => {
@@ -547,6 +562,9 @@ const clearNameError = () => {
 };
 const clearTypeError = () => {
   typeError.value = '';
+};
+const clearLogoError = () => {
+  logoError.value = '';
 };
 
 const validateSubscriptionForm = (): boolean => {
@@ -564,6 +582,11 @@ const validateSubscriptionForm = (): boolean => {
 
   if (!type) {
     typeError.value = '타입을 선택해주세요';
+    valid = false;
+  }
+
+  if (!selectedLogoFile.value) {
+    logoError.value = '이미지를 업로드해주세요';
     valid = false;
   }
 
@@ -592,8 +615,11 @@ const saveSubscription = async () => {
 
 const cancelSaveSubscription = () => {
   isAddingSubscription.value = false;
+  selectedLogoFile.value = null;
+  logoPreviewUrl.value = null;
   nameError.value = '';
   typeError.value = '';
+  logoError.value = '';
   subscriptionRegisterForm.value = {
     name: '',
     type: '',
@@ -1243,6 +1269,17 @@ const pageNumbers = computed<(number | string)[]>(() => {
 }
 
 /* 로고 업로드 */
+.logo-upload-container {
+  display: flex;
+  justify-content: center;
+}
+.logo-upload-outer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  gap: 5px;
+}
 .logo-upload-wrap {
   display: flex;
   justify-content: center;
@@ -1269,9 +1306,13 @@ const pageNumbers = computed<(number | string)[]>(() => {
   background: var(--mint-glow);
   color: var(--mint);
 }
+.logo-upload-box.error {
+  border-color: #ff6b6b;
+}
 .logo-upload-hint {
   font-size: 11px;
   font-weight: 500;
+  margin-left: 7px;
 }
 .logo-preview-img {
   width: 110px;
