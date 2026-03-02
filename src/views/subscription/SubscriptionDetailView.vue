@@ -887,8 +887,8 @@ const validatePlanFormLocal = (form: PlanForm): boolean => {
   if (!name) {
     planNameError.value = '플랜명을 입력해주세요';
     valid = false;
-  } else if (name.length > 10) {
-    planNameError.value = '플랜명은 최대 10자까지 가능해요';
+  } else if (name.length > 20) {
+    planNameError.value = '플랜명은 최대 20자까지 가능해요';
     valid = false;
   }
 
