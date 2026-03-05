@@ -151,6 +151,7 @@ export interface Member {
   nickname: string;
   memberSubscriptionCount: number;
   customSubscriptionCount: number;
+  paymentReminderEnabled: boolean;
   reminderDaysBefore: number;
   lastActiveAt: string;
   createdAt: string;

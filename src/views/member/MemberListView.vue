@@ -187,7 +187,7 @@
               >
             </td>
             <td class="col-reminder">
-              <div v-if="member.reminderDaysBefore > 0" class="reminder-on">
+              <div v-if="member.paymentReminderEnabled" class="reminder-on">
                 <svg
                   width="12"
                   height="12"
