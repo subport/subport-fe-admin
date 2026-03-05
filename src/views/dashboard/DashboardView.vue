@@ -433,117 +433,28 @@
 </template>
 
 <script setup lang="ts">
-import {
-  getRecentMembers,
-  getSignUpTrend,
-  getStats,
-  getTodayEmailNotifications,
-  getTopCustomSubscriptions,
-  getTopSubscriptions,
-} from '@/api/dashboard';
-import type {
-  DashboardStatsResponse,
-  RecentMember,
-  SignupTrendsResponse,
-  TodayEmailNotificationsResponse,
-  TopCustomSubscription,
-  TopSubscription,
-} from '@/api/types';
-import type { SignupBar, StatCard } from '@/types/dashboard';
+import { useDashboardStore } from '@/stores/dashboard';
 import { computed, onMounted, ref } from 'vue';
+
+const dashboardStore = useDashboardStore();
 
 // ── 상태 ─────────────────────────────────────────
 const isRefreshing = ref<boolean>(false);
-const lastUpdated = ref<string>('');
 const hoveredBar = ref<number | null>(null);
 
-// ── statCards: API 응답 → UI 카드 배열로 매핑 ────
-const statCards = ref<StatCard[]>([]);
-
-function buildStatCards(data: DashboardStatsResponse): StatCard[] {
-  const todayTrend = data.todayNewMemberCount - data.yesterdayNewMemberCount;
-  return [
-    {
-      label: '전체 가입자',
-      value: Number(data.totalMemberCount),
-      trend: Number(data.weeklyNewMemberCount),
-      trendUnit: '명',
-      sub: '이번 주 신규',
-      iconClass: 'icon-blue',
-      showTrend: true,
-      iconPaths: [
-        'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2',
-        'M9 7 a4 4 0 1 0 0.001 0',
-        'M23 21v-2a4 4 0 0 0-3-3.87',
-        'M16 3.13a4 4 0 0 1 0 7.75',
-      ],
-    },
-    {
-      label: '오늘 신규 가입',
-      value: Number(data.todayNewMemberCount),
-      trend: todayTrend,
-      trendUnit: '명',
-      sub: '어제 대비',
-      iconClass: 'icon-green',
-      showTrend: true,
-      iconPaths: [
-        'M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2',
-        'M8.5 7 a4 4 0 1 0 0.001 0',
-        'M20 8v6',
-        'M23 11h-6',
-      ],
-    },
-    {
-      label: '활성 구독 수',
-      value: Number(data.totalMemberSubscriptionCount),
-      trend: Number(data.weeklyNewMemberSubscriptionCount),
-      trendUnit: '건',
-      sub: '이번 주 신규 등록',
-      iconClass: 'icon-purple',
-      showTrend: true,
-      iconPaths: ['M2 5h20v14H2z', 'M2 10h20'],
-    },
-    {
-      label: '활성 유저 (최근 30일 이내 활동)',
-      value: Number(data.currentActiveMemberCount),
-      trend: 0,
-      trendUnit: '',
-      sub: '',
-      iconClass: 'icon-orange',
-      showTrend: false,
-      iconPaths: ['M22 12h-4l-3 9L9 3l-3 9H2'],
-    },
-  ];
-}
-
-const signupBars = ref<SignupBar[]>([]);
-const isLoading = ref(true);
-
-function buildSignupBars(data: SignupTrendsResponse): SignupBar[] {
-  const today = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Seoul',
-  }).format(new Date());
-  return data.signupTrends.map(item => {
-    const [, m, d] = item.date.split('-');
-    return {
-      label: `${Number(m)}/${Number(d)}`,
-      value: item.newMemberCount,
-      isToday: item.date === today,
-    };
-  });
-}
-
-const recentMembers = ref<RecentMember[]>([]);
-
-const todayEmailNotifications = ref<TodayEmailNotificationsResponse>({
-  notifications: [],
-  successCount: 0,
-  failedCount: 0,
-  pendingCount: 0,
-});
-
-const topSubscriptions = ref<TopSubscription[]>([]);
-const topCustomSubscriptions = ref<TopCustomSubscription[]>([]);
+// ── 스토어에서 데이터 가져오기 ──────────────────────
+const statCards = computed(() => dashboardStore.statCards);
+const signupBars = computed(() => dashboardStore.signupBars);
+const recentMembers = computed(() => dashboardStore.recentMembers);
+const todayEmailNotifications = computed(
+  () => dashboardStore.todayEmailNotifications,
+);
+const topSubscriptions = computed(() => dashboardStore.topSubscriptions);
+const topCustomSubscriptions = computed(
+  () => dashboardStore.topCustomSubscriptions,
+);
+const lastUpdated = computed(() => dashboardStore.lastUpdated);
+const isLoading = dashboardStore.isLoading;
 
 // ── computed ──────────────────────────────────────
 const todayFormatted = computed<string>(() => {
@@ -631,101 +542,15 @@ function formatNotiTime(sentAt: string | null): string {
   return `${hh}:${mm}`;
 }
 
-function updateLastUpdated(): void {
-  const now = new Date();
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-  const d = String(now.getDate()).padStart(2, '0');
-  const hh = String(now.getHours()).padStart(2, '0');
-  const mm = String(now.getMinutes()).padStart(2, '0');
-  lastUpdated.value = `${y}.${m}.${d} ${hh}:${mm}`;
-}
-
 // ── 메서드 ────────────────────────────────────────
-async function fetchStats(): Promise<void> {
-  try {
-    const { data } = await getStats();
-    statCards.value = buildStatCards(data);
-  } catch (e) {
-    console.error('대시보드 통계 조회 실패', e);
-  }
-}
-
-async function fetchSignupBars(): Promise<void> {
-  try {
-    const { data } = await getSignUpTrend();
-    signupBars.value = buildSignupBars(data);
-  } catch (e) {
-    console.error('신규 가입자 추이 조회 실패', e);
-  }
-}
-
-async function fetchRecentMembers(): Promise<void> {
-  try {
-    const { data } = await getRecentMembers();
-    recentMembers.value = data.members;
-  } catch (e) {
-    console.error('최근 가입 회원 조회 실패', e);
-  }
-}
-
-async function fetchTodayEmailNotifications(): Promise<void> {
-  try {
-    const { data } = await getTodayEmailNotifications();
-    todayEmailNotifications.value = data;
-  } catch (e) {
-    console.error('오늘 이메일 발송 현황 조회 실패', e);
-  }
-}
-
-async function fetchTopSubscriptions(): Promise<void> {
-  try {
-    const { data } = await getTopSubscriptions();
-    topSubscriptions.value = data.topSubscriptions;
-  } catch (e) {
-    console.error('구독 등록 현황 조회 실패', e);
-  }
-}
-
-async function fetchTopCustomSubscriptions(): Promise<void> {
-  try {
-    const { data } = await getTopCustomSubscriptions();
-    topCustomSubscriptions.value = data.topCustomSubscriptions;
-  } catch (e) {
-    console.error('커스텀 구독 등록 현황 조회 실패', e);
-  }
-}
-
 async function refreshData(): Promise<void> {
   isRefreshing.value = true;
-  await Promise.all([
-    fetchStats(),
-    fetchSignupBars(),
-    fetchRecentMembers(),
-    fetchTodayEmailNotifications(),
-    fetchTopSubscriptions(),
-    fetchTopCustomSubscriptions(),
-  ]);
+  await dashboardStore.refreshData();
   isRefreshing.value = false;
-  updateLastUpdated();
 }
 
 onMounted(async () => {
-  try {
-    await Promise.all([
-      fetchStats(),
-      fetchSignupBars(),
-      fetchRecentMembers(),
-      fetchTodayEmailNotifications(),
-      fetchTopSubscriptions(),
-      fetchTopCustomSubscriptions(),
-    ]);
-    updateLastUpdated();
-  } catch (e) {
-    console.error('데이터 로드 실패:', e);
-  } finally {
-    isLoading.value = false;
-  }
+  await dashboardStore.initFromCache();
 });
 </script>
 
