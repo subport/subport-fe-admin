@@ -126,6 +126,24 @@
             피드백 관리
           </RouterLink>
         </li>
+        <li>
+          <RouterLink to="/test-feedbacks" class="nav-item">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 3h6" />
+              <path d="M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" />
+            </svg>
+            테스트 피드백 관리
+          </RouterLink>
+        </li>
       </ul>
     </div>
   </nav>
