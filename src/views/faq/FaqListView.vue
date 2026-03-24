@@ -578,7 +578,7 @@ const deleteFaq = async (id: number) => {
 }
 
 .detail-content {
-  padding: 14px 14px 14px 64px;
+  padding: 14px 40px 14px 80px;
   animation: slideDown 0.2s ease;
   text-align: left;
 }
