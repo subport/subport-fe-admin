@@ -270,6 +270,26 @@ export interface GetFeedbacksParams {
   category?: string;
 }
 
+export interface TestFeedbacksResponse {
+  testFeedbacks: TestFeedback[];
+  currentPage: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface TestFeedback {
+  id: number;
+  overall: string;
+  featureRequest: string;
+  createdAt: string;
+}
+
+export interface GetTestFeedbacksParams {
+  page: number;
+  size: number;
+  date?: string;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
