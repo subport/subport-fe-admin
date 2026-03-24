@@ -2,6 +2,7 @@ import DashboardView from '@/views/dashboard/DashboardView.vue';
 import EmailNotificationListView from '@/views/emailnotification/EmailNotificationListView.vue';
 import FaqListView from '@/views/faq/FaqListView.vue';
 import FeedbackListView from '@/views/feedback/FeedbackListView.vue';
+import TestFeedbackListView from '@/views/feedback/TestFeedbackListView.vue';
 import LoginView from '@/views/LoginView.vue';
 import MemberListView from '@/views/member/MemberListView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
@@ -56,6 +57,11 @@ const routes = [
   {
     path: '/feedbacks',
     component: FeedbackListView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/test-feedbacks',
+    component: TestFeedbackListView,
     meta: { requiresAuth: true },
   },
 
