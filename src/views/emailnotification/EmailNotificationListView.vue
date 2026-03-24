@@ -277,7 +277,20 @@
               </td>
               <td class="col-payment">{{ formatDate(item.paymentDate) }}</td>
               <td class="col-dday">
-                <span class="dday-badge">D-{{ item.daysBeforePayment }}</span>
+                <span class="dday-badge">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                  </svg>
+                  D-{{ item.daysBeforePayment }}</span
+                >
               </td>
               <td class="col-status">
                 <span class="status-badge" :class="item.status.toLowerCase()">
@@ -1260,8 +1273,8 @@ function formatDateTime(dateTimeStr: string | null): string {
 .count-badge {
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-raised);
+  color: var(--mint);
+  background: var(--mint-glow);
   padding: 3px 10px;
   border-radius: 10px;
   border: 1px solid var(--border-mid);
@@ -1269,12 +1282,17 @@ function formatDateTime(dateTimeStr: string | null): string {
 
 /* D-day 배지 */
 .dday-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
-  font-weight: 700;
-  color: #b197fc;
-  background: rgba(121, 80, 242, 0.15);
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-raised);
   padding: 3px 8px;
   border-radius: 10px;
+  border: 1px solid rgba(111, 207, 195, 0.2);
+  white-space: nowrap;
 }
 
 /* 상태 배지 */

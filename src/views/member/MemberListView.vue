@@ -830,8 +830,8 @@ function formatDate(isoString: string): string {
   display: inline-block;
   font-size: 12px;
   font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-raised);
+  color: var(--mint);
+  background: var(--mint-glow);
   padding: 2px 10px;
   border-radius: 10px;
   border: 1px solid var(--border-mid);
@@ -849,8 +849,8 @@ function formatDate(isoString: string): string {
   gap: 4px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--mint);
-  background: var(--mint-glow);
+  color: var(--text-secondary);
+  background: var(--bg-raised);
   padding: 3px 8px;
   border-radius: 10px;
   border: 1px solid rgba(111, 207, 195, 0.2);
