@@ -107,6 +107,25 @@
             FAQ 관리
           </RouterLink>
         </li>
+        <li>
+          <RouterLink to="/feedbacks" class="nav-item">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M21 15a4 4 0 0 1-4 4H7l-4 4V5a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"
+              />
+            </svg>
+            피드백 관리
+          </RouterLink>
+        </li>
       </ul>
     </div>
   </nav>
