@@ -247,6 +247,29 @@ export interface UpdateFaqRequest {
   answer: string;
 }
 
+// 피드백
+export interface FeedbacksResponse {
+  feedbacks: Feedback[];
+  currentPage: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface Feedback {
+  id: number;
+  category: string;
+  subCategory: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface GetFeedbacksParams {
+  page: number;
+  size: number;
+  date?: string;
+  category?: string;
+}
+
 // 상수
 export const SUBSCRIPTION_TYPES = [
   'OTT',
