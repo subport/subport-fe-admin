@@ -271,9 +271,7 @@
                 <span class="email-text">{{ item.email }}</span>
               </td>
               <td class="col-count">
-                <span class="count-badge"
-                  >{{ item.subscriptions.length }}건</span
-                >
+                <span class="count-badge">{{ item.subscriptionCount }}건</span>
               </td>
               <td class="col-payment">{{ formatDate(item.paymentDate) }}</td>
               <td class="col-dday">
@@ -309,35 +307,21 @@
               <td colspan="7" class="detail-cell">
                 <div class="detail-content">
                   <div
-                    v-for="(sub, subIndex) in item.subscriptions"
-                    :key="subIndex"
+                    v-for="(subscription, index) in item.subscriptions"
+                    :key="index"
                     class="detail-item"
                   >
                     <div class="detail-left">
                       <img
-                        v-if="sub.logoImageUrl"
-                        :src="sub.logoImageUrl"
-                        :alt="sub.name"
+                        :src="subscription.logoImageUrl"
+                        alt="logo"
                         class="detail-logo"
                       />
-                      <div v-else class="detail-logo-fallback">
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="2"
-                        >
-                          <rect x="2" y="3" width="20" height="14" rx="2" />
-                          <line x1="8" y1="21" x2="16" y2="21" />
-                          <line x1="12" y1="17" x2="12" y2="21" />
-                        </svg>
-                      </div>
-                      <span class="detail-name">{{ sub.name }}</span>
+                      <span class="detail-name">{{ subscription.name }}</span>
                     </div>
                     <span class="detail-amount"
-                      >{{ sub.amount }}{{ sub.amountUnit }}</span
+                      >{{ subscription.amount
+                      }}{{ subscription.amountUnit }}</span
                     >
                   </div>
                 </div>
@@ -398,9 +382,13 @@
 </template>
 
 <script setup lang="ts">
-import { getEmailNotifications } from '@/api/emailNotification';
+import {
+  getEmailNotificationDetails,
+  getEmailNotifications,
+} from '@/api/emailNotification';
 import type {
   EmailNotification,
+  GetEmailNotificationDetailsParams,
   GetEmailNotificationsParams,
 } from '@/api/types';
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
@@ -606,11 +594,25 @@ const ddayOptions = [
 // ── 펼침/접힘 ────────────────────────────────────
 const expandedRows = ref<Set<number>>(new Set());
 
-function toggleRow(index: number): void {
+async function toggleRow(index: number): Promise<void> {
   if (expandedRows.value.has(index)) {
     expandedRows.value.delete(index);
   } else {
     expandedRows.value.add(index);
+    const item = notifications.value[index];
+    if (item && !item.subscriptions) {
+      const params: GetEmailNotificationDetailsParams = {
+        email: item.email,
+        paymentDate: item.paymentDate,
+        daysBeforePayment: item.daysBeforePayment,
+      };
+      try {
+        const { data } = await getEmailNotificationDetails(params);
+        item.subscriptions = data;
+      } catch (e) {
+        console.error('구독 상세 조회 실패', e);
+      }
+    }
   }
   expandedRows.value = new Set(expandedRows.value);
 }
