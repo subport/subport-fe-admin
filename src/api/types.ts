@@ -177,15 +177,16 @@ export interface EmailNotificationsResponse {
 
 export interface EmailNotification {
   email: string;
+  subscriptionCount: number;
   paymentDate: string; // LocalDate
   daysBeforePayment: number; // 1 or 3만 존재
   status: string; // PENDING, FAILED, SENT
   retryCount: number; // status가 FAILED일 때만 표기, 총 시도 횟수는 3회 고정
   sentAt: string; // LocalDateTime
-  subscriptions: SubscriptionInEmailNotification[];
+  subscriptions?: EmailNotificationDetailResponse[];
 }
 
-export interface SubscriptionInEmailNotification {
+export interface EmailNotificationDetailResponse {
   logoImageUrl: string;
   name: string;
   amount: string; // "#,###" 형태로 넘어온 상태
@@ -200,6 +201,12 @@ export interface GetEmailNotificationsParams {
   status?: string;
   daysBeforePayment?: number;
   email?: string;
+}
+
+export interface GetEmailNotificationDetailsParams {
+  email: string;
+  paymentDate: string;
+  daysBeforePayment: number;
 }
 
 // 인증
