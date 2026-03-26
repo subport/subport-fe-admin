@@ -47,7 +47,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     const todayTrend = data.todayNewMemberCount - data.yesterdayNewMemberCount;
     return [
       {
-        label: '전체 가입자',
+        label: '전체 회원',
         value: Number(data.totalMemberCount),
         trend: Number(data.weeklyNewMemberCount),
         trendUnit: '명',
@@ -62,7 +62,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         ],
       },
       {
-        label: '오늘 신규 가입',
+        label: '오늘 신규 회원',
         value: Number(data.todayNewMemberCount),
         trend: todayTrend,
         trendUnit: '명',
@@ -77,21 +77,36 @@ export const useDashboardStore = defineStore('dashboard', () => {
         ],
       },
       {
+        label: '오늘 방문자',
+        value: Number(data.todayGuestCount),
+        trend: Number(data.todayGuestCount) - Number(data.yesterdayGuestCount),
+        trendUnit: '명',
+        sub: '어제 대비',
+        iconClass: 'icon-gray',
+        showTrend: true,
+        iconPaths: [
+          'M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2',
+          'M8.5 7 a4 4 0 1 0 0.001 0',
+          'M20 8v6',
+          'M23 11h-6',
+        ],
+      },
+      {
         label: '활성 구독 수',
         value: Number(data.totalMemberSubscriptionCount),
         trend: Number(data.weeklyNewMemberSubscriptionCount),
         trendUnit: '건',
-        sub: '이번 주 신규 등록',
+        sub: '이번 주 신규',
         iconClass: 'icon-purple',
         showTrend: true,
         iconPaths: ['M2 5h20v14H2z', 'M2 10h20'],
       },
       {
-        label: '활성 유저 (최근 30일 이내 활동)',
+        label: '활성 회원',
         value: Number(data.currentActiveMemberCount),
         trend: 0,
         trendUnit: '',
-        sub: '',
+        sub: '최근 30일 이내 활동',
         iconClass: 'icon-orange',
         showTrend: false,
         iconPaths: ['M22 12h-4l-3 9L9 3l-3 9H2'],

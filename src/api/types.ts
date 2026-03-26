@@ -81,6 +81,8 @@ export interface DashboardStatsResponse {
   totalMemberSubscriptionCount: number;
   weeklyNewMemberSubscriptionCount: number;
   currentActiveMemberCount: number;
+  todayGuestCount: number;
+  yesterdayGuestCount: number;
 }
 
 export interface SignupTrendsResponse {

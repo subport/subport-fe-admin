@@ -69,8 +69,8 @@
                 <template v-else></template>
                 {{ Math.abs(stat.trend) }}{{ stat.trendUnit }}
               </span>
-              <span class="stat-sub">{{ stat.sub }}</span>
             </template>
+            <span class="stat-sub">{{ stat.sub }}</span>
           </div>
         </div>
       </div>
@@ -655,7 +655,7 @@ onMounted(async () => {
 /* ── 핵심 지표 카드 ──────────────────────────────── */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
   margin-bottom: 20px;
 }
@@ -712,6 +712,10 @@ onMounted(async () => {
 .icon-orange {
   background: rgba(253, 126, 20, 0.15);
   color: #ffa94d;
+}
+.icon-gray {
+  background: rgba(156, 163, 175, 0.15);
+  color: #9ca3af;
 }
 .stat-content {
   flex: 1;
