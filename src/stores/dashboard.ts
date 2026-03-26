@@ -77,7 +77,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         ],
       },
       {
-        label: '오늘 방문자',
+        label: '오늘 게스트',
         value: Number(data.todayGuestCount),
         trend: Number(data.todayGuestCount) - Number(data.yesterdayGuestCount),
         trendUnit: '명',
