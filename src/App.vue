@@ -4,10 +4,18 @@
   </div>
 
   <div v-else class="app-layout">
-    <TheHeader />
-    <!-- 헤더를 최상단으로 -->
+    <TheHeader @toggle-nav="toggleMobileNav" />
     <div class="body-area">
-      <TheNav />
+      <TheNav
+        :class="{ 'mobile-open': mobileNavOpen }"
+        @click="closeMobileNav"
+      />
+      <!-- 모바일 오버레이 -->
+      <div
+        v-if="mobileNavOpen"
+        class="mobile-nav-overlay"
+        @click="closeMobileNav"
+      />
       <div class="content-area">
         <TheView />
       </div>
@@ -16,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import TheHeader from './layouts/TheHeader.vue';
 import TheNav from './layouts/TheNav.vue';
@@ -24,8 +32,17 @@ import TheView from './layouts/TheView.vue';
 
 const route = useRoute();
 
-// route meta에 { layout: 'auth' } 가 있으면 네브/헤더 숨김
 const isAuthPage = computed(() => route.meta?.layout === 'auth');
+
+const mobileNavOpen = ref(false);
+
+function toggleMobileNav() {
+  mobileNavOpen.value = !mobileNavOpen.value;
+}
+
+function closeMobileNav() {
+  mobileNavOpen.value = false;
+}
 </script>
 
 <style>
@@ -55,5 +72,45 @@ const isAuthPage = computed(() => route.meta?.layout === 'auth');
   flex: 1;
   overflow-y: auto;
   background: #1a1c22;
+}
+
+/* ── 모바일 네비게이션 ─────────────────────────────── */
+.mobile-nav-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .the-nav {
+    position: fixed;
+    left: -260px;
+    top: 75px;
+    bottom: 0;
+    width: 260px;
+    z-index: 99;
+    transition: left 0.25s ease;
+  }
+
+  .the-nav.mobile-open {
+    left: 0;
+  }
+
+  .mobile-nav-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    top: 75px;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 98;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
 </style>

@@ -1704,21 +1704,128 @@ onMounted(async () => {
 }
 
 /* ── 반응형 ──────────────────────────────────────── */
+@media (max-width: 1280px) {
+  .col-duration {
+    display: none;
+  }
+}
+@media (max-width: 1024px) {
+  .col-unit {
+    display: none;
+  }
+}
 @media (max-width: 768px) {
   .page {
+    padding: 16px;
+    gap: 14px;
+  }
+  .view-mode {
     padding: 16px;
   }
   .service-info {
     flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .service-logo {
+    width: 64px;
+    height: 64px;
+  }
+  .service-meta {
+    width: 100%;
+  }
+  .service-name {
+    font-size: 18px;
+  }
+  .service-tags {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .service-dates {
+    justify-content: center;
   }
   .action-btns {
-    flex-direction: row;
+    width: 100%;
+    justify-content: center;
     flex-wrap: wrap;
+  }
+  .btn-list,
+  .btn-edit,
+  .btn-delete {
+    flex: 1;
+    justify-content: center;
+    min-width: 80px;
+  }
+  .edit-body {
+    flex-direction: column;
+    padding: 16px;
+    gap: 20px;
+  }
+  .logo-edit-wrap {
+    width: 100%;
+    align-items: center;
+  }
+  .logo-edit-box {
+    width: 80px;
+    height: 80px;
+  }
+  .edit-fields {
+    min-width: 100%;
   }
   .form-row {
     grid-template-columns: 1fr;
   }
+  .plan-card-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .btn-add-plan {
+    width: 100%;
+    justify-content: center;
+  }
   .col-date {
+    display: none;
+  }
+  .col-amount {
+    display: none;
+  }
+  .col-name {
+    width: 100px;
+  }
+  .data-table th,
+  .data-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+}
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 16px;
+  }
+  .service-name {
+    font-size: 16px;
+  }
+  .service-logo {
+    width: 56px;
+    height: 56px;
+  }
+  .type-badge {
+    font-size: 10px;
+  }
+  .plan-link {
+    font-size: 11px;
+  }
+  .date-item {
+    font-size: 11px;
+  }
+  .btn-list,
+  .btn-edit,
+  .btn-delete {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .col-id {
     display: none;
   }
 }

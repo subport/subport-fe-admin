@@ -1,5 +1,21 @@
 <template>
   <header class="the-header">
+    <!-- 모바일: 햄버거 메뉴 버튼 -->
+    <button class="hamburger-btn" @click="$emit('toggle-nav')">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+      >
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+
     <!-- 왼쪽: 현재 페이지 타이틀 -->
     <div class="header-left">
       <RouterLink to="/" class="header-logo">
@@ -201,6 +217,8 @@ import {
   watch,
 } from 'vue';
 
+defineEmits(['toggle-nav']);
+
 const authStore = useAuthStore();
 
 // ── 관리자 정보 ──────────────────────────────────────
@@ -322,6 +340,31 @@ async function handlePasswordChange() {
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+/* ── 모바일 햄버거 버튼 ────────────────────────────── */
+.hamburger-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #f0f2f5;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.15s;
+}
+
+.hamburger-btn:hover {
+  background: #2a2d38;
+}
+
+@media (max-width: 768px) {
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+  }
 }
 
 .header-logo {

@@ -957,12 +957,80 @@ function formatDate(isoString: string): string {
   .page {
     padding: 16px;
   }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .page-title {
+    font-size: 20px;
+  }
   .filter-bar {
     flex-direction: column;
     align-items: stretch;
+    padding: 14px;
+    gap: 14px;
+  }
+  .filter-group {
+    width: 100%;
+  }
+  .search-group {
+    min-width: 100%;
+  }
+  .status-tabs {
+    flex-wrap: wrap;
+  }
+  .status-tab {
+    flex: 1;
+    min-width: calc(50% - 2px);
+    justify-content: center;
   }
   .col-subs {
     display: none;
+  }
+  .col-reminder {
+    display: none;
+  }
+  .col-status {
+    display: none;
+  }
+  .data-table th,
+  .data-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+  .col-id {
+    width: 40px;
+  }
+  .col-nickname {
+    width: 80px;
+  }
+  .col-email {
+    width: auto;
+    min-width: 120px;
+  }
+}
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 18px;
+  }
+  .filter-label {
+    font-size: 10px;
+  }
+  .status-tab {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+  .search-input {
+    font-size: 12px;
+  }
+  .search-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+  .reset-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 </style>

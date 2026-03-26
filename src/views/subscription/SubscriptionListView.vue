@@ -1408,8 +1408,16 @@ const pageNumbers = computed<(number | string)[]>(() => {
 }
 
 /* ── 반응형 ──────────────────────────────────────── */
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
   .col-date {
+    display: none;
+  }
+}
+@media (max-width: 1024px) {
+  .col-url {
+    display: none;
+  }
+  .col-logo {
     display: none;
   }
 }
@@ -1417,12 +1425,62 @@ const pageNumbers = computed<(number | string)[]>(() => {
   .page {
     padding: 16px;
   }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .page-title {
+    font-size: 20px;
+  }
+  .btn-add {
+    width: 100%;
+    justify-content: center;
+  }
   .filter-bar {
     flex-direction: column;
     align-items: stretch;
+    padding: 14px;
+    gap: 14px;
   }
-  .search-input {
+  .filter-group {
     width: 100%;
+  }
+  .search-group {
+    min-width: 100%;
+  }
+  .status-tabs {
+    flex-wrap: wrap;
+  }
+  .status-tab {
+    flex: 1;
+    min-width: calc(50% - 2px);
+    justify-content: center;
+  }
+  .col-type {
+    display: none;
+  }
+  .col-name {
+    width: auto;
+    min-width: 100px;
+  }
+  .data-table th,
+  .data-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+  .modal-box {
+    width: 90vw;
+    max-width: 400px;
+  }
+}
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 18px;
+  }
+  .status-tab {
+    padding: 6px 10px;
+    font-size: 11px;
   }
 }
 </style>

@@ -1456,9 +1456,14 @@ function formatDateTime(dateTimeStr: string | null): string {
 }
 
 /* ── 반응형 ──────────────────────────────────────── */
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
   .col-payment,
   .col-dday {
+    display: none;
+  }
+}
+@media (max-width: 1024px) {
+  .col-time {
     display: none;
   }
 }
@@ -1466,12 +1471,77 @@ function formatDateTime(dateTimeStr: string | null): string {
   .page {
     padding: 16px;
   }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .page-title {
+    font-size: 20px;
+  }
   .filter-bar {
     flex-direction: column;
     align-items: stretch;
+    padding: 14px;
+    gap: 14px;
+  }
+  .filter-group {
+    width: 100%;
+  }
+  .search-group {
+    min-width: 100%;
+  }
+  .status-tabs {
+    flex-wrap: wrap;
+  }
+  .status-tab {
+    flex: 1;
+    min-width: calc(33% - 3px);
+    justify-content: center;
   }
   .col-count {
     display: none;
+  }
+  .col-status {
+    display: none;
+  }
+  .data-table th,
+  .data-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+  .col-expand {
+    width: 30px;
+  }
+  .col-email {
+    width: auto;
+    min-width: 140px;
+  }
+  .calendar-popup {
+    width: 260px;
+    padding: 12px;
+  }
+  .calendar-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .calendar-select {
+    width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 18px;
+  }
+  .status-tab {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  .detail-content {
+    padding: 12px 16px 12px 32px;
+  }
+  .detail-left {
+    width: 100px;
   }
 }
 </style>

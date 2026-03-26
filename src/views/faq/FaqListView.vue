@@ -669,11 +669,7 @@ const deleteFaq = async (id: number) => {
 }
 
 /* 반응형 */
-@media (max-width: 1024px) {
-  .page {
-    padding: 16px;
-  }
-
+@media (max-width: 1280px) {
   .col-created,
   .col-modified {
     display: none;
@@ -684,6 +680,84 @@ const deleteFaq = async (id: number) => {
   .data-table th:nth-child(5),
   .data-table td:nth-child(5) {
     display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .btn-add {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .table-wrap {
+    padding: 0;
+    border-radius: 10px;
+  }
+
+  .col-expand {
+    width: 30px;
+  }
+
+  .col-question {
+    width: auto;
+    min-width: 120px;
+  }
+
+  .col-action {
+    width: 60px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .question-text {
+    max-width: 150px;
+  }
+
+  .row-actions {
+    gap: 4px;
+  }
+
+  .btn-icon-edit,
+  .btn-icon-delete {
+    width: 28px;
+    height: 28px;
+  }
+
+  .detail-content {
+    padding: 12px 16px 12px 48px;
+  }
+
+  .modal-box {
+    width: 90vw;
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 18px;
+  }
+
+  .question-text {
+    max-width: 100px;
   }
 }
 

@@ -400,4 +400,41 @@ watch(
     transform: rotate(360deg);
   }
 }
+
+/* ── 반응형 ──────────────────────────────────────── */
+@media (max-width: 480px) {
+  .login-card {
+    width: 90vw;
+    max-width: 400px;
+    border-radius: 14px;
+  }
+  .card-logo {
+    padding: 20px 24px 0;
+    justify-content: center;
+  }
+  .logo-img {
+    width: 40px;
+    height: 40px;
+  }
+  .logo-text {
+    font-size: 16px;
+  }
+  .card-title {
+    font-size: 18px;
+    margin: 16px 24px 4px;
+    text-align: center;
+  }
+  .card-sub {
+    font-size: 12px;
+    margin: 0 24px 20px;
+    text-align: center;
+  }
+  .login-form {
+    padding: 0 24px 24px;
+  }
+  .form-input {
+    font-size: 14px;
+    padding: 10px 38px;
+  }
+}
 </style>

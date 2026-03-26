@@ -1282,6 +1282,17 @@ onMounted(async () => {
 /* ── 반응형 ──────────────────────────────────────── */
 @media (max-width: 1280px) {
   .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .charts-row {
+    grid-template-columns: 1fr 280px;
+  }
+  .bottom-row {
+    grid-template-columns: 1fr 300px;
+  }
+}
+@media (max-width: 1024px) {
+  .stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
   .charts-row {
@@ -1301,12 +1312,103 @@ onMounted(async () => {
   .dashboard {
     padding: 16px;
   }
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
+  }
+  .stat-card {
+    padding: 14px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+  .stat-value {
+    font-size: 22px;
+  }
+  .stat-trend-row {
+    justify-content: center;
+  }
+  .charts-row {
+    gap: 12px;
+  }
+  .chart-card {
+    padding: 16px;
+  }
+  .chart-area {
+    height: 180px;
+  }
+  .bar-chart-body {
+    gap: 4px;
+  }
+  .bar-labels {
+    gap: 4px;
+  }
+  .bar-label {
+    font-size: 9px;
+  }
+  .bottom-row {
+    gap: 12px;
   }
   .right-stack {
     flex-direction: column;
+  }
+  .right-stack .info-card {
+    flex: none;
+  }
+  .noti-stat-row {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+  }
+  .noti-stat {
+    flex: none;
+    width: calc(50% - 6px);
+  }
+  .noti-divider {
+    display: none;
+  }
+  .info-card {
+    padding: 14px;
+  }
+  .info-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .card-title-wrap {
+    width: 100%;
+  }
+  .custom-threshold-hint {
+    display: block;
+    width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-title {
+    font-size: 20px;
+  }
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+  }
+  .stat-value {
+    font-size: 20px;
+  }
+  .noti-stat {
+    width: 100%;
   }
 }
 </style>

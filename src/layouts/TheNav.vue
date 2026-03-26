@@ -160,6 +160,7 @@
   padding: 20px 12px;
   box-sizing: border-box;
   font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+  transition: left 0.25s ease;
 }
 
 /* ── 로고 ─────────────────────────────────────────── */
